@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>I-PostPilot | Product Envisioning Document</title>
+  <style>
+    :root {
+      --bg: #0b0d12;
+      --panel: #151923;
+      --panel-2: #1d2230;
+      --text: #f4f6fb;
+      --muted: #aab2c5;
+      --accent: #8bf0c6;
+      --accent-2: #8eb5ff;
+      --warning: #ffd27d;
+      --border: #30384b;
+      --code: #0f131c;
+    }
+    body.cream-mode {
+      --bg: #f5efe3;
+      --panel: #fffaf0;
+      --panel-2: #ebe1d1;
+      --text: #2e2a25;
+      --muted: #665f55;
+      --accent: #176b58;
+      --accent-2: #315f9f;
+      --warning: #9a6411;
+      --border: #d5c8b5;
+      --code: #eee6d8;
+      background: radial-gradient(circle at top right, #fffaf0 0, var(--bg) 42rem);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background: radial-gradient(circle at top right, #1d2843 0, var(--bg) 42rem);
+      font: 16px/1.6 Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+    }
+    main { max-width: 1180px; margin: auto; padding: 48px 24px 80px; }
+    header { padding: 48px 0 28px; border-bottom: 1px solid var(--border); }
+    h1 { margin: 0; font-size: clamp(2.3rem, 5vw, 4.8rem); line-height: 1; letter-spacing: -0.06em; }
+    h2 { margin-top: 52px; font-size: 2rem; color: var(--accent); }
+    h3 { margin-top: 30px; color: var(--accent-2); }
+    p, li { color: var(--muted); }
+    strong { color: var(--text); }
+    .eyebrow { color: var(--accent); text-transform: uppercase; letter-spacing: .16em; font-size: .78rem; font-weight: 700; }
+    .lead { max-width: 820px; font-size: 1.2rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+    .card, table, pre, .callout { border: 1px solid var(--border); background: rgba(21, 25, 35, .9); border-radius: 14px; }
+    .card { padding: 20px; }
+    .card h3 { margin-top: 0; }
+    .bucket-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 24px; }
+    .bucket-card { padding: 18px 18px 16px; border: 1px solid var(--border); border-radius: 14px; background: rgba(21, 25, 35, .92); }
+    .det-card { border-color: rgba(139, 240, 198, .8); }
+    .prob-card { border-color: rgba(142, 181, 255, .8); }
+    .human-card { border-color: rgba(255, 210, 125, .8); }
+    .bucket-label { display: inline-block; margin-bottom: 8px; padding: 4px 10px; border-radius: 999px; font-size: .77rem; font-weight: 700; letter-spacing: .04em; text-transform: lowercase; }
+    .det-card .bucket-label { background: var(--accent); color: #06150f; }
+    .prob-card .bucket-label { background: var(--accent-2); color: #081329; }
+    .human-card .bucket-label { background: var(--warning); color: #241807; }
+    .bucket-card p { margin: 0; color: var(--muted); }
+    .tag { display: inline-block; margin: 3px 4px 3px 0; padding: 3px 9px; border-radius: 999px; font-size: .78rem; }
+    .det { color: #06150f; background: var(--accent); }
+    .prob { color: #081329; background: var(--accent-2); }
+    .human { color: #241807; background: var(--warning); }
+    table { width: 100%; border-collapse: collapse; overflow: hidden; margin: 18px 0; }
+    th, td { padding: 13px 15px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+    th { color: var(--text); background: var(--panel-2); }
+    td { color: var(--muted); }
+    tr:last-child td { border-bottom: 0; }
+    pre { padding: 18px; overflow-x: auto; color: #dce6ff; background: var(--code); }
+    code { color: #dce6ff; }
+    .callout { padding: 18px 22px; border-left: 4px solid var(--accent); }
+    .sequence { counter-reset: step; list-style: none; padding: 0; }
+    .sequence li { counter-increment: step; position: relative; padding: 12px 16px 12px 54px; margin: 8px 0; background: var(--panel); border-radius: 10px; }
+    .sequence li::before { content: counter(step); position: absolute; left: 16px; top: 12px; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: #07130f; text-align: center; font-weight: 700; }
+    .diagram-shell { border: 1px solid var(--border); background: rgba(15, 19, 28, .88); border-radius: 16px; padding: 18px; overflow: hidden; }
+    .diagram-toolbar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .diagram-toolbar button, .flow-tabs button { cursor: pointer; border: 1px solid var(--border); border-radius: 9px; padding: 8px 12px; color: var(--muted); background: var(--panel); }
+    .diagram-toolbar button:hover, .flow-tabs button:hover, .flow-tabs button.active { color: #07130f; background: var(--accent); border-color: var(--accent); }
+    .diagram-viewport { overflow: auto; border: 1px solid var(--border); border-radius: 12px; background: #0b0e15; }
+    .topology-legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 0 0 14px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--panel); }
+    .legend-item { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-size: .82rem; }
+    .legend-swatch { width: 18px; height: 12px; border: 2px solid; border-radius: 3px; }
+    .legend-swatch.control { background: #182239; border-color: #aab2c5; }
+    .legend-swatch.det { background: #172a29; border-color: var(--accent); }
+    .legend-swatch.ai { background: #1d2941; border-color: var(--accent-2); }
+    .legend-swatch.data { background: #2a2417; border-color: var(--warning); }
+    .legend-line { width: 22px; height: 0; border-top: 2px solid; }
+    .legend-line.request { border-color: var(--accent-2); }
+    .legend-line.ai-path { border-color: var(--accent); }
+    .legend-line.data-path { border-color: var(--warning); border-top-style: dashed; }
+    .architecture-map { position: relative; min-width: 900px; min-height: 440px; transform-origin: top left; transition: transform .2s ease; }
+    .map-node { position: absolute; width: 154px; padding: 11px 10px; border: 1px solid var(--accent-2); border-radius: 10px; background: #182239; color: var(--text); text-align: center; cursor: pointer; z-index: 2; }
+    .map-node:hover, .map-node.selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(139,240,198,.18); }
+    .map-node small { display: block; margin-top: 3px; color: var(--muted); font-size: .72rem; }
+    .map-node.det-node { border-color: var(--accent); }
+    .map-node.ai-node { border-color: var(--accent-2); }
+    .map-node.human-node { border-color: var(--warning); }
+    .map-lines { position: absolute; inset: 0; width: 900px; height: 440px; pointer-events: none; }
+    .map-lines line { stroke: #52617c; stroke-width: 2; stroke-dasharray: 5 5; }
+    .diagram-info { margin-top: 14px; min-height: 84px; padding: 14px 16px; border-left: 4px solid var(--accent); background: var(--panel); border-radius: 8px; }
+    .flow-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .flow-track { display: flex; gap: 10px; overflow-x: auto; padding: 12px 4px 18px; }
+    .flow-step { min-width: 170px; min-height: 112px; padding: 13px; border: 1px solid var(--border); border-radius: 11px; background: var(--panel); cursor: pointer; }
+    .flow-step:hover, .flow-step.selected { border-color: var(--accent); background: #1b2b2a; }
+    .flow-step .number { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: #07130f; font-weight: 700; margin-bottom: 7px; }
+    .flow-step strong { display: block; font-size: .92rem; }
+    .flow-step small { color: var(--muted); font-size: .77rem; }
+    .flow-arrow { align-self: center; color: var(--accent-2); font-size: 1.4rem; }
+    .theme-toggle { position: fixed; top: 16px; right: 20px; z-index: 10; cursor: pointer; border: 1px solid var(--border); border-radius: 999px; padding: 8px 13px; color: var(--muted); background: var(--panel); font: inherit; font-size: .84rem; box-shadow: 0 5px 18px rgba(0,0,0,.12); }
+    .theme-toggle:hover, .theme-toggle:focus-visible { color: var(--text); border-color: var(--accent); outline: 2px solid var(--accent); outline-offset: 2px; }
+    body.cream-mode .diagram-viewport { background: #e9dfcf; }
+    body.cream-mode .architecture-map .map-node { background: #fffaf0; color: var(--text); }
+    body.cream-mode .architecture-map .map-node small { color: var(--muted); }
+    body.cream-mode .flow-step:hover, body.cream-mode .flow-step.selected { background: #e2eee6; }
+    body.cream-mode .legend-swatch.control { background: #e8e1d5; border-color: #665f55; }
+    body.cream-mode .legend-swatch.det { background: #dcefe7; }
+    body.cream-mode .legend-swatch.ai { background: #dfe8f7; }
+    body.cream-mode .legend-swatch.data { background: #f1e4c7; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    footer { margin-top: 58px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); }
+  </style>
+</head>
+<body>
+<button type="button" class="theme-toggle" id="themeToggle" aria-pressed="false">☀ Cream mode</button>
+<main>
+  <header>
+    <div class="eyebrow">Product Envisioning Document | Hackathon MVP</div>
+    <h1>I-PostPilot</h1>
+    <p class="lead">An AI-assisted content repurposing workspace that learns a creator's style from their work artifacts, converts long-form video into short-form clips, and keeps the creator in control of every publishable output.</p>
+    <p><span class="tag det">deterministic controls</span><span class="tag prob">probabilistic intelligence</span><span class="tag human">human approval required</span></p>
+    <div class="bucket-grid" aria-label="Decision framework buckets">
+      <div class="bucket-card det-card">
+        <div class="bucket-label">deterministic controls</div>
+        <p>Key decisions: validate uploads, enforce workspace ownership, lock state transitions, retry only safe failures, and refuse outputs that lack evidence or valid media constraints.</p>
+      </div>
+      <div class="bucket-card prob-card">
+        <div class="bucket-label">probabilistic intelligence</div>
+        <p>Key decisions: propose themes, clip candidates, hooks, captions, and style signals from transcript and archive evidence while keeping confidence and uncertainty visible.</p>
+      </div>
+      <div class="bucket-card human-card">
+        <div class="bucket-label">human approval required</div>
+        <p>Key decisions: accept, reject, or edit any publishable clip, confirm final captions, and authorize any external publish flow before work leaves the workspace.</p>
+      </div>
+    </div>
+  </header>
+
+  <section>
+    <h2>1. Product promise and MVP boundary</h2>
+    <div class="callout">
+      <strong>Promise:</strong> I-PostPilot turns a creator's existing MP4 content and work archive into evidence-backed short clips without replacing the creator's editorial judgment.
+    </div>
+    <p>The MVP supports one creator, one workspace, MP4 input, and one short-video output format. The first release should not attempt autonomous publishing, full video understanding, or a general-purpose social media scheduler.</p>
+    <div class="grid">
+      <div class="card"><h3>Flow 1: Creator setup</h3><p>Collect persona preferences and 15-20 work artifacts. Analyze them asynchronously and produce a versioned <code>CREATOR_SKILLS.md</code> profile.</p></div>
+      <div class="card"><h3>Flow 2: Clip production</h3><p>Upload an input video, find strong segments, generate an editorial preview, and allow the creator to refine the result through an AI editor chat.</p></div>
+      <div class="card"><h3>Non-negotiable</h3><p>The model may recommend, draft, and explain. The creator approves the final clip and its caption before publication.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>2. High-level architecture</h2>
+    <pre><code>Browser
+  |
+  v
+API Gateway / Auth ------------------------------+
+  |                                               |
+  v                                               v
+Workflow Orchestrator                      Realtime Updates
+  |                                               |
+  +--> Asset Service --> Object Storage            |
+  +--> Media Service --> audio / proxy / metadata |
+  +--> Transcription Service --> timestamped text |
+  +--> Creator Intelligence Service               |
+  |       +--> archive embeddings                 |
+  |       +--> CREATOR_SKILLS.md                  |
+  +--> Clip Intelligence Service                  |
+  |       +--> segment detection                  |
+  |       +--> clip plan                          |
+  +--> Render Service --> preview MP4             |
+  +--> Review and Feedback Service                |
+          +--> approval, edits, metrics, memory  |
+                                                  |
+                 PostgreSQL + vector index <-----+</code></pre>
+    <p>The orchestrator owns workflow state and call order. Services should be stateless where possible. Large videos, audio, rendered clips, and thumbnails belong in object storage; the database stores metadata, references, status, and structured AI results.</p>
+    <div class="diagram-shell" style="margin-top:20px">
+      <div class="diagram-toolbar">
+        <strong>Logical backend topology</strong>
+        <span class="tag det">deterministic controls</span>
+        <span class="tag prob">probabilistic intelligence</span>
+        <span class="tag human">data and persistence</span>
+      </div>
+      <div class="topology-legend" aria-label="Topology color legend">
+        <span class="legend-item"><span class="legend-swatch control"></span>control plane</span>
+        <span class="legend-item"><span class="legend-swatch det"></span>deterministic service</span>
+        <span class="legend-item"><span class="legend-swatch ai"></span>AI-heavy service</span>
+        <span class="legend-item"><span class="legend-swatch data"></span>data store</span>
+        <span class="legend-item"><span class="legend-line request"></span>request / orchestration</span>
+        <span class="legend-item"><span class="legend-line ai-path"></span>AI processing</span>
+        <span class="legend-item"><span class="legend-line data-path"></span>read / write persistence</span>
+      </div>
+      <div class="diagram-viewport" aria-label="Logical I-PostPilot backend topology diagram">
+        <svg viewBox="0 0 1120 650" role="img" aria-labelledby="topologyTitle topologyDesc" style="display:block;min-width:920px;width:100%;height:auto;background:#0b0e15">
+          <title id="topologyTitle">I-PostPilot backend topology</title>
+          <desc id="topologyDesc">Browser connects to API Gateway and authentication, which calls the workflow orchestrator. The orchestrator calls asset, media, transcription, creator intelligence, clip intelligence, render, and review services. Services use object storage and PostgreSQL with a vector index. Realtime updates return to the browser.</desc>
+          <defs>
+            <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#8eb5ff"/></marker>
+            <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#8bf0c6"/></marker>
+            <marker id="arrow-yellow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#ffd27d"/></marker>
+          </defs>
+          <style>
+            .topo-box{fill:#182239;stroke:#aab2c5;stroke-width:2}
+            .topo-det{fill:#172a29;stroke:#8bf0c6}
+            .topo-ai{fill:#1d2941;stroke:#8eb5ff}
+            .topo-data{fill:#2a2417;stroke:#ffd27d}
+            .topo-title{fill:#f4f6fb;font:700 15px Inter,system-ui,sans-serif}
+            .topo-sub{fill:#aab2c5;font:12px Inter,system-ui,sans-serif}
+            .topo-line{fill:none;stroke:#8eb5ff;stroke-width:2;marker-end:url(#arrow-blue)}
+            .topo-ai-line{fill:none;stroke:#8bf0c6;stroke-width:2;marker-end:url(#arrow-green)}
+            .topo-data-line{fill:none;stroke:#ffd27d;stroke-width:2;stroke-dasharray:6 5;marker-end:url(#arrow-yellow)}
+          </style>
+          <rect class="topo-box" x="40" y="42" width="150" height="60" rx="12"/>
+          <text class="topo-title" x="115" y="68" text-anchor="middle">Browser</text>
+          <text class="topo-sub" x="115" y="88" text-anchor="middle">creator workspace</text>
+          <rect class="topo-box" x="270" y="42" width="190" height="60" rx="12"/>
+          <text class="topo-title" x="365" y="68" text-anchor="middle">API Gateway / Auth</text>
+          <text class="topo-sub" x="365" y="88" text-anchor="middle">REST, identity, access</text>
+          <rect class="topo-box" x="545" y="42" width="210" height="60" rx="12"/>
+          <text class="topo-title" x="650" y="68" text-anchor="middle">Realtime Updates</text>
+          <text class="topo-sub" x="650" y="88" text-anchor="middle">progress and job events</text>
+          <rect class="topo-det" x="270" y="155" width="245" height="68" rx="12"/>
+          <text class="topo-title" x="392" y="183" text-anchor="middle">Workflow Orchestrator</text>
+          <text class="topo-sub" x="392" y="204" text-anchor="middle">state, queues, retries, call order</text>
+          <rect class="topo-data" x="745" y="155" width="270" height="68" rx="12"/>
+          <text class="topo-title" x="880" y="183" text-anchor="middle">PostgreSQL + vector index</text>
+          <text class="topo-sub" x="880" y="204" text-anchor="middle">metadata, embeddings, audit trail</text>
+          <rect class="topo-det" x="40" y="300" width="190" height="70" rx="12"/>
+          <text class="topo-title" x="135" y="328" text-anchor="middle">Asset Service</text>
+          <text class="topo-sub" x="135" y="349" text-anchor="middle">uploads and permissions</text>
+          <rect class="topo-det" x="270" y="300" width="190" height="70" rx="12"/>
+          <text class="topo-title" x="365" y="328" text-anchor="middle">Media Service</text>
+          <text class="topo-sub" x="365" y="349" text-anchor="middle">audio, proxy, metadata</text>
+          <rect class="topo-ai" x="500" y="300" width="210" height="70" rx="12"/>
+          <text class="topo-title" x="605" y="328" text-anchor="middle">Transcription Service</text>
+          <text class="topo-sub" x="605" y="349" text-anchor="middle">timestamped text</text>
+          <rect class="topo-ai" x="750" y="300" width="190" height="70" rx="12"/>
+          <text class="topo-title" x="845" y="328" text-anchor="middle">Creator Intelligence</text>
+          <text class="topo-sub" x="845" y="349" text-anchor="middle">archive + skills profile</text>
+          <rect class="topo-ai" x="40" y="470" width="210" height="70" rx="12"/>
+          <text class="topo-title" x="145" y="498" text-anchor="middle">Clip Intelligence</text>
+          <text class="topo-sub" x="145" y="519" text-anchor="middle">segments and clip plan</text>
+          <rect class="topo-det" x="300" y="470" width="190" height="70" rx="12"/>
+          <text class="topo-title" x="395" y="498" text-anchor="middle">Render Service</text>
+          <text class="topo-sub" x="395" y="519" text-anchor="middle">preview MP4</text>
+          <rect class="topo-det" x="540" y="470" width="260" height="70" rx="12"/>
+          <text class="topo-title" x="670" y="498" text-anchor="middle">Review and Feedback</text>
+          <text class="topo-sub" x="670" y="519" text-anchor="middle">approval, edits, metrics, memory</text>
+          <rect class="topo-data" x="850" y="470" width="180" height="70" rx="12"/>
+          <text class="topo-title" x="940" y="498" text-anchor="middle">Object Storage</text>
+          <text class="topo-sub" x="940" y="519" text-anchor="middle">MP4, audio, previews</text>
+          <!-- Control plane: one straight request path across the top. -->
+          <path class="topo-line" d="M190 72 H270"/>
+          <path class="topo-line" d="M460 72 H545"/>
+          <path class="topo-line" d="M365 102 V155"/>
+          <!-- Realtime reads workflow state and event metadata from the database. -->
+          <path class="topo-data-line" d="M755 102 V125 H880 V155"/>
+
+          <!-- Orchestrator bus: each service has its own non-crossing lane. -->
+          <path class="topo-line" d="M270 189 H20 V335 H40"/>
+          <path class="topo-line" d="M392 223 V270 H365 V300"/>
+          <path class="topo-ai-line" d="M515 189 H605 V300"/>
+          <path class="topo-ai-line" d="M515 205 H845 V300"/>
+          <path class="topo-ai-line" d="M515 223 H560 V440 H145 V470"/>
+          <path class="topo-line" d="M515 223 H580 V450 H395 V470"/>
+          <path class="topo-line" d="M515 223 H600 V460 H670 V470"/>
+
+          <!-- Persistence: only the services that own media or knowledge write to storage. -->
+          <path class="topo-data-line" d="M230 335 V400 H850 V470"/>
+          <path class="topo-data-line" d="M460 335 V430 H820 V470 H850"/>
+          <path class="topo-data-line" d="M845 370 V410 H1040 V189 H1015"/>
+          <path class="topo-data-line" d="M800 505 H850"/>
+          <text class="topo-sub" x="505" y="140" text-anchor="middle">orchestrated service calls</text>
+          <text class="topo-sub" x="98" y="285" text-anchor="middle">media path</text>
+          <text class="topo-sub" x="930" y="270" text-anchor="middle">metadata / vectors</text>
+        </svg>
+      </div>
+      <div class="diagram-info"><strong>How to read this topology</strong><br><span>Blue paths show request and orchestration flow. Green paths show AI-heavy processing. Yellow dashed paths show media persistence, metadata, embeddings, and audit storage.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Interactive architecture and workflows</h2>
+    <p>Click an architecture service to inspect its responsibility, then select a workflow and click each step to follow the backend call order. Use the zoom controls when presenting the diagram.</p>
+    <div class="diagram-shell">
+      <div class="diagram-toolbar">
+        <strong>Service architecture map</strong>
+        <div>
+          <button type="button" id="zoomOut" aria-label="Zoom out">−</button>
+          <button type="button" id="zoomReset">Reset</button>
+          <button type="button" id="zoomIn" aria-label="Zoom in">+</button>
+        </div>
+      </div>
+      <div class="diagram-viewport">
+        <div class="architecture-map" id="architectureMap" aria-label="Interactive I-PostPilot service architecture">
+          <svg class="map-lines" viewBox="0 0 900 440" aria-hidden="true">
+            <line x1="112" y1="73" x2="310" y2="73"/><line x1="442" y1="73" x2="640" y2="73"/>
+            <line x1="387" y1="105" x2="387" y2="170"/><line x1="387" y1="230" x2="140" y2="330"/>
+            <line x1="387" y1="230" x2="340" y2="330"/><line x1="387" y1="230" x2="540" y2="330"/>
+            <line x1="387" y1="230" x2="740" y2="330"/><line x1="717" y1="105" x2="717" y2="170"/>
+          </svg>
+          <button type="button" class="map-node det-node" style="left:35px;top:45px" data-title="Browser" data-detail="The creator uploads assets, watches progress, reviews evidence, uses editor chat, and explicitly approves the result.">Browser<small>creator workspace</small></button>
+          <button type="button" class="map-node det-node" style="left:310px;top:45px" data-title="API Gateway / Auth" data-detail="Authenticates requests, enforces workspace isolation, validates payloads, and returns job IDs for long-running operations.">API Gateway<small>auth + REST</small></button>
+          <button type="button" class="map-node det-node" style="left:640px;top:45px" data-title="Realtime Updates" data-detail="Streams job progress and review-ready events to the browser without keeping upload or rendering requests open.">Realtime Updates<small>events + status</small></button>
+          <button type="button" class="map-node det-node" style="left:310px;top:170px" data-title="Workflow Orchestrator" data-detail="Owns call order, durable state transitions, idempotency keys, bounded retries, and failure recovery. It does not make editorial decisions.">Orchestrator<small>state + queues</small></button>
+          <button type="button" class="map-node det-node" style="left:640px;top:170px" data-title="Data Layer" data-detail="PostgreSQL stores metadata, workflow state, decisions, and structured AI results. A vector index supports semantic archive retrieval.">PostgreSQL + vectors<small>metadata + search</small></button>
+          <button type="button" class="map-node det-node" style="left:65px;top:300px" data-title="Asset and Media Services" data-detail="Validates MP4s, stores source assets, extracts audio, creates proxies, reads metadata, and generates thumbnails.">Asset + Media<small>deterministic</small></button>
+          <button type="button" class="map-node ai-node" style="left:265px;top:300px" data-title="Transcription Service" data-detail="Runs speech-to-text and diarization, returning timestamped words or chunks with confidence values.">Transcription<small>speech AI</small></button>
+          <button type="button" class="map-node ai-node" style="left:465px;top:300px" data-title="Creator Intelligence" data-detail="Retrieves archive examples and synthesizes a versioned creator skill profile from declared preferences and observed work.">Creator Intelligence<small>profile AI</small></button>
+          <button type="button" class="map-node ai-node" style="left:665px;top:300px" data-title="Clip + Render + Review" data-detail="Ranks clip candidates, validates time ranges, renders previews, evaluates quality, and records creator approval or rejection.">Clip pipeline<small>AI + human gate</small></button>
+        </div>
+      </div>
+      <div class="diagram-info" id="architectureInfo"><strong>Browser</strong><br><span>Click any node to inspect its role in the system.</span></div>
+    </div>
+
+    <div class="diagram-shell" style="margin-top:20px">
+      <div class="flow-tabs" role="tablist" aria-label="Workflow selection">
+        <button type="button" class="active" data-flow="onboarding" role="tab">Flow 1: Creator setup</button>
+        <button type="button" data-flow="clipping" role="tab">Flow 2: Clip production</button>
+      </div>
+      <div class="flow-track" id="flowTrack" aria-live="polite"></div>
+      <div class="diagram-info" id="flowInfo"><strong>Step 1</strong><br><span>Select a workflow step to see the API call and output.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>3. Deterministic versus probabilistic design</h2>
+    <table>
+      <thead><tr><th>Area</th><th>Deterministic application code</th><th>Probabilistic AI</th><th>Final authority</th></tr></thead>
+      <tbody>
+        <tr><td>Identity and access</td><td>Sessions, workspace ownership, permissions, rate limits</td><td>None</td><td>Application rules</td></tr>
+        <tr><td>Media ingestion</td><td>MP4 MIME/size/duration checks, checksum, audio-track check, storage</td><td>Speech-to-text, speaker diarization</td><td>System plus creator correction</td></tr>
+        <tr><td>Creator profile</td><td>Schema, versioning, artifact IDs, job state</td><td>Style/theme extraction and instruction synthesis</td><td>Creator can edit and approve</td></tr>
+        <tr><td>Clip selection</td><td>Valid time ranges, maximum duration, render parameters</td><td>Hook, highlight, narrative arc, visual-interest ranking</td><td>Creator selects or revises</td></tr>
+        <tr><td>Quality checks</td><td>Schema, duration, missing evidence, rendering success</td><td>Voice fit, semantic repetition, claim quality, editorial usefulness</td><td>Creator review gate</td></tr>
+        <tr><td>Publishing</td><td>Explicit approval token, audit log, provider request</td><td>Caption and title suggestions only</td><td><strong>Creator only</strong></td></tr>
+      </tbody>
+    </table>
+    <div class="callout"><strong>Safety rule:</strong> a failed AI check must never be represented as a passed check. Store <code>not_run</code>, <code>uncertain</code>, and <code>failed</code> distinctly from <code>passed</code>.</div>
+  </section>
+
+  <section>
+    <h2>4. Backend services and functioning</h2>
+    <table>
+      <thead><tr><th>Service</th><th>Functioning</th><th>AI usage</th><th>Primary output</th></tr></thead>
+      <tbody>
+        <tr><td><strong>API Gateway</strong></td><td>Authenticates requests, validates payloads, applies tenant isolation, and returns job IDs for long work.</td><td>None</td><td>REST/JSON response</td></tr>
+        <tr><td><strong>Asset Service</strong></td><td>Creates signed upload URLs, records checksums, stores artifact metadata, and prevents unauthorized asset access.</td><td>None</td><td><code>asset_id</code></td></tr>
+        <tr><td><strong>Media Service</strong></td><td>Reads MP4 metadata, extracts normalized audio, creates a browser preview proxy, and generates thumbnails.</td><td>Optional visual frame description later</td><td><code>media_manifest</code></td></tr>
+        <tr><td><strong>Transcription Service</strong></td><td>Submits audio to speech-to-text, normalizes words into timestamped chunks, and records confidence and speakers.</td><td>Speech-to-text and diarization</td><td><code>transcript_id</code></td></tr>
+        <tr><td><strong>Archive Service</strong></td><td>Stores artifact text and metadata, creates embeddings, and retrieves relevant creator examples.</td><td>Embeddings and semantic retrieval</td><td><code>archive_context</code></td></tr>
+        <tr><td><strong>Creator Intelligence Service</strong></td><td>Combines persona inputs, transcript summaries, and archive examples into a versioned creator profile.</td><td>Theme, tone, hook, editing preference extraction</td><td><code>creator_skills_version</code></td></tr>
+        <tr><td><strong>Clip Intelligence Service</strong></td><td>Proposes time ranges and a clip plan, then checks that the plan is internally valid.</td><td>Hook detection, narrative segmentation, ranking</td><td><code>clip_candidates</code></td></tr>
+        <tr><td><strong>Render Service</strong></td><td>Turns a validated clip plan into a proxy or final MP4 with captions, crop, overlays, and audio settings.</td><td>Optional caption styling suggestions</td><td><code>render_job</code>, preview URL</td></tr>
+        <tr><td><strong>Editor Chat Service</strong></td><td>Converts creator chat requests into bounded editing commands and requests a new render.</td><td>Intent extraction and command planning</td><td><code>edit_plan</code></td></tr>
+        <tr><td><strong>Review and Feedback Service</strong></td><td>Records preview decisions, edits, rejection reasons, and acceptance metrics.</td><td>Feedback classification and preference suggestions</td><td>Decision event and memory update</td></tr>
+        <tr><td><strong>Workflow Orchestrator</strong></td><td>Runs state transitions, retries transient failures, and publishes progress events.</td><td>Does not make editorial decisions</td><td>Workflow status</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>5. Flow 1 - creator onboarding and skill profile</h2>
+    <p>The objective is to transform explicit preferences and real work artifacts into a creator-controlled, versioned instruction profile. The profile is an aid to generation, not an irreversible persona label.</p>
+    <ol class="sequence">
+      <li><strong>Create workspace:</strong> UI calls <code>POST /v1/workspaces</code>. Auth service verifies the user and creates a workspace.</li>
+      <li><strong>Save declared preferences:</strong> UI calls <code>PUT /v1/creators/{creatorId}/preferences</code> with delivery style, visual preferences, editing rules, and hook preferences.</li>
+      <li><strong>Upload artifacts:</strong> Asset Service returns signed URLs from <code>POST /v1/assets/upload-intents</code>. Browser uploads MP4, image, reel, or RAW files directly to object storage.</li>
+      <li><strong>Finalize each upload:</strong> UI calls <code>POST /v1/assets/{assetId}/complete</code>. Asset Service verifies checksum, type, and ownership, then emits <code>artifact.ready</code>.</li>
+      <li><strong>Create onboarding job:</strong> UI calls <code>POST /v1/creator-profiles/{creatorId}/build</code>. API immediately returns <code>job_id</code>.</li>
+      <li><strong>Inspect media:</strong> Orchestrator calls Media Service for metadata, audio extraction, thumbnails, and a normalized representation.</li>
+      <li><strong>Transcribe audio artifacts:</strong> Orchestrator calls Transcription Service for audio-bearing files. Images and silent assets are passed to visual metadata extraction or marked as non-transcript artifacts.</li>
+      <li><strong>Index the archive:</strong> Archive Service stores searchable text, metadata, embeddings, and links each observation to its source artifact.</li>
+      <li><strong>Analyze the creator:</strong> Creator Intelligence Service receives preferences plus a bounded sample of archive observations. The model returns structured tone, topics, hook patterns, editing preferences, visual patterns, and explicit evidence references.</li>
+      <li><strong>Validate and version:</strong> Application code validates the schema, rejects unsupported claims, creates <code>creator_skills_v1</code>, and stores the raw model response for auditability.</li>
+      <li><strong>Present for approval:</strong> UI receives <code>job.completed</code>, fetches <code>GET /v1/creator-profiles/{creatorId}/skills</code>, and displays a pre-filled editable profile.</li>
+      <li><strong>Learn only after confirmation:</strong> Creator edits are saved as explicit preferences. They are not silently merged into the profile.</li>
+    </ol>
+    <pre><code>POST /v1/creator-profiles/{id}/build
+-> 202 { "job_id": "job_123", "status": "queued" }
+
+GET /v1/jobs/job_123
+-> { "status": "completed", "result_id": "skills_456" }
+
+GET /v1/creator-profiles/{id}/skills
+-> {
+     "version": "v1",
+     "tone": ["direct", "conversational"],
+     "hooks": ["contrarian observation", "specific result"],
+     "editing_rules": ["remove filler", "keep pauses out"],
+     "evidence": ["asset_03", "asset_11"]
+   }</code></pre>
+  </section>
+
+  <section>
+    <h2>6. Flow 2 - video to short clip</h2>
+    <p>The objective is to make clip creation a reviewable editorial workflow. The AI proposes a clip plan; the rendering system executes only validated time ranges and the creator approves the preview.</p>
+    <ol class="sequence">
+      <li><strong>Upload source MP4:</strong> Asset Service validates the upload and returns <code>asset_id</code>.</li>
+      <li><strong>Create clip job:</strong> UI calls <code>POST /v1/clip-jobs</code> with source asset, target aspect ratio, duration range, caption preferences, and <code>creator_skills_version</code>.</li>
+      <li><strong>Prepare media:</strong> Orchestrator calls Media Service for duration, frame rate, audio track, proxy video, thumbnails, and normalized audio.</li>
+      <li><strong>Transcribe:</strong> Transcription Service produces timestamped words, sentences, speakers, and confidence values.</li>
+      <li><strong>Retrieve creator context:</strong> Archive Service retrieves similar accepted clips/posts and Creator Intelligence Service returns the active skill profile.</li>
+      <li><strong>Find candidate moments:</strong> Clip Intelligence Service receives transcript, timestamps, skills, and archive context. It returns several candidates with hook, start/end time, rationale, confidence, and evidence.</li>
+      <li><strong>Apply deterministic validation:</strong> Orchestrator rejects invalid ranges, clips beyond source duration, clips outside the configured duration, and candidates with missing transcript evidence.</li>
+      <li><strong>Render preview:</strong> Render Service receives one selected or top-ranked valid plan and creates a low-resolution preview with captions.</li>
+      <li><strong>Run review checks:</strong> Review Service checks transcript support, caption timing, style fit, archive repetition, and output constraints. Uncertainty is displayed as a warning.</li>
+      <li><strong>Show editorial preview:</strong> UI displays video preview, timeline, transcript, evidence, warnings, and the editor chat.</li>
+      <li><strong>Interpret chat commands:</strong> Editor Chat Service converts messages such as "start later and remove the first sentence" into a typed edit plan. It cannot execute arbitrary shell or media commands.</li>
+      <li><strong>Re-render:</strong> If the plan passes validation, Render Service creates a new preview version. The old version remains available for comparison.</li>
+      <li><strong>Approve:</strong> Creator calls <code>POST /v1/clip-jobs/{id}/decisions</code> with <code>accepted</code>, <code>edited</code>, or <code>rejected</code>. Only accepted output can reach a future publishing integration.</li>
+    </ol>
+    <pre><code>POST /v1/clip-jobs
+{
+  "source_asset_id": "asset_789",
+  "creator_id": "creator_123",
+  "target": { "aspect_ratio": "9:16", "min_seconds": 20, "max_seconds": 60 },
+  "skills_version": "skills_456"
+}
+
+-> 202 { "job_id": "clip_job_321", "status": "queued" }
+
+GET /v1/clip-jobs/clip_job_321
+-> {
+     "status": "review_ready",
+     "preview_asset_id": "preview_654",
+     "candidates": [
+       {
+         "start_ms": 762000,
+         "end_ms": 814000,
+         "hook": "The first sentence of the candidate clip",
+         "confidence": 0.84,
+         "evidence_chunk_ids": ["chunk_04", "chunk_05"]
+       }
+     ],
+     "checks": { "source_support": "passed", "voice_fit": "uncertain" }
+   }</code></pre>
+  </section>
+
+  <section>
+    <h2>7. AI model placement</h2>
+    <table>
+      <thead><tr><th>Task</th><th>Model capability</th><th>Placement and reason</th></tr></thead>
+      <tbody>
+        <tr><td>MP4 transcription</td><td>Speech-to-text with timestamps and diarization</td><td>Transcription provider or Whisper-class model. This is separate from the text LLM because timestamp accuracy is the primary concern.</td></tr>
+        <tr><td>Archive embeddings</td><td>Semantic vector representation</td><td>Embedding model at ingestion time; retrieve top candidates before calling a reasoning model.</td></tr>
+        <tr><td>Profile extraction</td><td>Structured analysis of examples</td><td>Fast structured-output LLM. It must return evidence IDs and confidence rather than unsupported personality claims.</td></tr>
+        <tr><td>Clip candidate ranking</td><td>Long-context reasoning and editorial judgment</td><td>Stronger LLM after deterministic segmentation and retrieval. It proposes, never publishes.</td></tr>
+        <tr><td>Chat command parsing</td><td>Intent extraction into a small command schema</td><td>Fast LLM constrained to commands such as trim, change captions, crop, reorder, and regenerate.</td></tr>
+        <tr><td>Quality evaluation</td><td>Claim comparison, voice and novelty estimation</td><td>Smaller verifier model plus deterministic checks. Results are warnings and evidence, not absolute truth.</td></tr>
+      </tbody>
+    </table>
+    <p>Use a model router so extraction, classification, and formatting use a fast model, while ambiguous editorial ranking and final draft/profile synthesis use a stronger model. Keep model names configurable in environment settings rather than hard-coding them into service logic.</p>
+  </section>
+
+  <section>
+    <h2>8. Workflow state and asynchronous execution</h2>
+    <p>Video processing and model calls can take seconds or minutes. Do not keep the browser request open. Each long-running operation is a job with durable state and progress events.</p>
+    <pre><code>ONBOARDING:
+created -> uploading -> indexing -> analyzing -> awaiting_creator_review -> active | failed
+
+CLIP_JOB:
+created -> validating -> transcribing -> finding_candidates -> rendering_preview
+          -> checking -> review_ready -> editing -> rendering_preview
+          -> approved | rejected | failed</code></pre>
+    <p>Workers consume queue messages such as <code>artifact.ready</code>, <code>transcript.ready</code>, <code>profile.build.requested</code>, and <code>render.requested</code>. The orchestrator records an idempotency key for every message so retries do not duplicate renders, charges, or database records.</p>
+  </section>
+
+  <section>
+    <h2>9. Failure and quality rules</h2>
+    <table>
+      <thead><tr><th>Failure</th><th>Required behavior</th></tr></thead>
+      <tbody>
+        <tr><td>Corrupt, non-MP4, or oversized upload</td><td>Reject before AI processing and show a repairable validation message.</td></tr>
+        <tr><td>No audio track or transcription failure</td><td>Stop the dependent workflow; preserve the asset and offer an explicit retry.</td></tr>
+        <tr><td>Low-confidence words in a proposed hook</td><td>Show the timestamp as unverified and ask the creator to confirm or choose another candidate.</td></tr>
+        <tr><td>Invalid model JSON</td><td>Retry once with schema errors; then mark the step failed. Never parse by silently guessing fields.</td></tr>
+        <tr><td>Render failure</td><td>Keep the clip plan and create a retryable render job; do not mark the preview ready.</td></tr>
+        <tr><td>Creator rejects output</td><td>Store the rejection and reason. Do not silently regenerate or erase the rejected version.</td></tr>
+        <tr><td>AI provider timeout</td><td>Retry bounded transient failures with backoff; surface a clear job error when limits are reached.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>10. Implementation order</h2>
+    <ol class="sequence">
+      <li>Build authentication, workspace isolation, asset uploads, object storage, and job tracking.</li>
+      <li>Build MP4 metadata validation, audio extraction, timestamped transcription, and transcript review.</li>
+      <li>Build artifact indexing, embeddings, archive retrieval, and creator profile versioning.</li>
+      <li>Build deterministic clip plans and a basic renderer before adding AI ranking.</li>
+      <li>Add AI candidate selection with evidence, confidence, and bounded structured output.</li>
+      <li>Add captions, preview checks, and the editor chat as typed editing commands.</li>
+      <li>Add creator approval, feedback persistence, metrics, and a failure demonstration.</li>
+      <li>Only after the loop is stable, add optional publishing integrations or visual AI features.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>11. Hackathon demo success criteria</h2>
+    <div class="grid">
+      <div class="card"><h3>Traceability</h3><p>Click a claim or caption and jump to the exact transcript timestamp in the source video.</p></div>
+      <div class="card"><h3>Agency</h3><p>Show the creator changing a clip through chat, reviewing the result, and approving it explicitly.</p></div>
+      <div class="card"><h3>Learning</h3><p>Show a rejected or edited result becoming a recorded preference for a later run.</p></div>
+      <div class="card"><h3>Reliability</h3><p>Demonstrate an unsupported or low-confidence moment being surfaced rather than silently shipped.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <strong>I-PostPilot design principle:</strong> deterministic services protect state, evidence, permissions, and media integrity; probabilistic services propose meaning and style; the creator controls the final editorial decision.
+  </footer>
+</main>
+<script>
+  const themeToggle = document.getElementById("themeToggle");
+  const savedTheme = window.localStorage.getItem("ipostpilot-theme");
+
+  function applyTheme(theme) {
+    const creamMode = theme === "cream";
+    document.body.classList.toggle("cream-mode", creamMode);
+    themeToggle.setAttribute("aria-pressed", String(creamMode));
+    themeToggle.textContent = creamMode ? "☾ Dark mode" : "☀ Cream mode";
+  }
+
+  applyTheme(savedTheme === "cream" ? "cream" : "dark");
+  themeToggle.addEventListener("click", () => {
+    const nextTheme = document.body.classList.contains("cream-mode") ? "dark" : "cream";
+    window.localStorage.setItem("ipostpilot-theme", nextTheme);
+    applyTheme(nextTheme);
+  });
+
+  const architectureMap = document.getElementById("architectureMap");
+  const architectureInfo = document.getElementById("architectureInfo");
+  let mapScale = 1;
+
+  document.querySelectorAll(".map-node").forEach((node) => {
+    node.addEventListener("click", () => {
+      document.querySelectorAll(".map-node").forEach((item) => item.classList.remove("selected"));
+      node.classList.add("selected");
+      architectureInfo.innerHTML = "<strong>" + node.dataset.title + "</strong><br><span>" + node.dataset.detail + "</span>";
+    });
+  });
+
+  function setMapScale(nextScale) {
+    mapScale = Math.min(1.35, Math.max(.7, nextScale));
+    architectureMap.style.transform = "scale(" + mapScale + ")";
+    architectureMap.parentElement.style.height = (440 * mapScale + 8) + "px";
+  }
+
+  document.getElementById("zoomIn").addEventListener("click", () => setMapScale(mapScale + .1));
+  document.getElementById("zoomOut").addEventListener("click", () => setMapScale(mapScale - .1));
+  document.getElementById("zoomReset").addEventListener("click", () => setMapScale(1));
+
+  const flows = {
+    onboarding: [
+      ["1", "Create workspace", "POST /v1/workspaces", "Auth verifies the creator and creates an isolated workspace."],
+      ["2", "Upload artifacts", "POST /v1/assets/upload-intents", "Browser uploads MP4, images, reels, and RAW files to object storage."],
+      ["3", "Build profile", "POST /v1/creator-profiles/{id}/build", "API returns a job ID; the orchestrator begins asynchronous processing."],
+      ["4", "Prepare media", "Media Service", "Validate files, extract audio, create thumbnails, and normalize media."],
+      ["5", "Index archive", "Transcription + Archive Services", "Create timestamped observations, embeddings, and evidence links."],
+      ["6", "Synthesize skills", "Creator Intelligence Service", "Generate structured tone, hooks, visual, and editing instructions."],
+      ["7", "Approve profile", "GET /v1/creator-profiles/{id}/skills", "Show editable CREATOR_SKILLS.md; save creator corrections explicitly."]
+    ],
+    clipping: [
+      ["1", "Upload source MP4", "POST /v1/assets/upload-intents", "Validate ownership, MIME type, checksum, duration, and audio track."],
+      ["2", "Create clip job", "POST /v1/clip-jobs", "Store target aspect ratio, duration, caption rules, and skills version."],
+      ["3", "Transcribe", "Transcription Service", "Return timestamped words, speakers, and confidence values."],
+      ["4", "Find moments", "Clip Intelligence Service", "Rank hooks and narrative segments using transcript and creator context."],
+      ["5", "Validate plan", "Workflow Orchestrator", "Reject invalid time ranges, missing evidence, and duration violations."],
+      ["6", "Render preview", "Render Service", "Create a captioned preview MP4 and run quality checks."],
+      ["7", "Edit in chat", "Editor Chat Service", "Convert creator language into bounded typed editing commands."],
+      ["8", "Approve clip", "POST /v1/clip-jobs/{id}/decisions", "Record accept, edit, or reject; only acceptance can enable publishing."]
+    ]
+  };
+
+  const flowTrack = document.getElementById("flowTrack");
+  const flowInfo = document.getElementById("flowInfo");
+
+  function renderFlow(flowName) {
+    flowTrack.innerHTML = "";
+    flows[flowName].forEach((step, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "flow-step" + (index === 0 ? " selected" : "");
+      button.innerHTML = '<span class="number">' + step[0] + '</span><strong>' + step[1] + '</strong><small>' + step[2] + '</small>';
+      button.addEventListener("click", () => {
+        flowTrack.querySelectorAll(".flow-step").forEach((item) => item.classList.remove("selected"));
+        button.classList.add("selected");
+        flowInfo.innerHTML = "<strong>Step " + step[0] + ": " + step[1] + "</strong><br><code>" + step[2] + "</code><br><span>" + step[3] + "</span>";
+      });
+      flowTrack.appendChild(button);
+      if (index < flows[flowName].length - 1) {
+        const arrow = document.createElement("span");
+        arrow.className = "flow-arrow";
+        arrow.setAttribute("aria-hidden", "true");
+        arrow.textContent = "→";
+        flowTrack.appendChild(arrow);
+      }
+    });
+    const first = flows[flowName][0];
+    flowInfo.innerHTML = "<strong>Step " + first[0] + ": " + first[1] + "</strong><br><code>" + first[2] + "</code><br><span>" + first[3] + "</span>";
+  }
+
+  document.querySelectorAll(".flow-tabs button").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".flow-tabs button").forEach((item) => item.classList.remove("active"));
+      tab.classList.add("active");
+      renderFlow(tab.dataset.flow);
+    });
+  });
+
+  renderFlow("onboarding");
+</script>
+</body>
+</html>

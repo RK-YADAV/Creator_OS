@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>I-PostPilot | Technical Proposal</title>
+  <style>
+    :root {
+      --bg: #0b0d12;
+      --panel: #151923;
+      --panel-2: #1d2230;
+      --text: #f4f6fb;
+      --muted: #aab2c5;
+      --accent: #8bf0c6;
+      --accent-2: #8eb5ff;
+      --warning: #ffd27d;
+      --danger: #ff9b9b;
+      --border: #30384b;
+      --code: #0f131c;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background: radial-gradient(circle at top right, #1d2843 0, var(--bg) 42rem);
+      font: 16px/1.6 Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+    }
+    main { max-width: 1200px; margin: auto; padding: 42px 24px 80px; }
+    header { padding: 42px 0 30px; border-bottom: 1px solid var(--border); }
+    h1 { margin: 0; font-size: clamp(2.3rem, 5vw, 4.8rem); line-height: 1; letter-spacing: -0.06em; }
+    h2 { margin-top: 56px; font-size: 2rem; color: var(--accent); }
+    h3 { margin-top: 30px; color: var(--accent-2); }
+    p, li { color: var(--muted); }
+    strong { color: var(--text); }
+    a { color: var(--accent-2); }
+    .eyebrow { color: var(--accent); text-transform: uppercase; letter-spacing: .16em; font-size: .78rem; font-weight: 700; }
+    .lead { max-width: 900px; font-size: 1.2rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+    .tag { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: .78rem; font-weight: 700; }
+    .green { color: #06150f; background: var(--accent); }
+    .blue { color: #081329; background: var(--accent-2); }
+    .yellow { color: #241807; background: var(--warning); }
+    .red { color: #2b0b0b; background: var(--danger); }
+    .toc { position: sticky; top: 12px; z-index: 5; display: flex; flex-wrap: wrap; gap: 7px; margin: 18px 0 8px; padding: 10px; border: 1px solid var(--border); border-radius: 12px; background: rgba(21,25,35,.94); backdrop-filter: blur(10px); }
+    .toc a { padding: 5px 9px; color: var(--muted); text-decoration: none; border-radius: 7px; font-size: .84rem; }
+    .toc a:hover { color: #07130f; background: var(--accent); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(245px, 1fr)); gap: 16px; }
+    .card, table, pre, .callout, .diagram-shell { border: 1px solid var(--border); background: rgba(21,25,35,.9); border-radius: 14px; }
+    .card { padding: 20px; }
+    .card h3 { margin-top: 0; }
+    .card ul { margin-bottom: 0; padding-left: 20px; }
+    .callout { padding: 19px 22px; border-left: 4px solid var(--accent); }
+    .callout.warning { border-left-color: var(--warning); }
+    .callout.danger { border-left-color: var(--danger); }
+    table { width: 100%; border-collapse: collapse; overflow: hidden; margin: 18px 0; }
+    th, td { padding: 13px 15px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+    th { color: var(--text); background: var(--panel-2); }
+    td { color: var(--muted); }
+    tr:last-child td { border-bottom: 0; }
+    pre { padding: 18px; overflow-x: auto; color: #dce6ff; background: var(--code); }
+    code { color: #dce6ff; }
+    .sequence { counter-reset: step; list-style: none; padding: 0; }
+    .sequence li { counter-increment: step; position: relative; padding: 13px 16px 13px 56px; margin: 9px 0; background: var(--panel); border-radius: 10px; }
+    .sequence li::before { content: counter(step); position: absolute; left: 16px; top: 13px; width: 25px; height: 25px; border-radius: 50%; background: var(--accent); color: #07130f; text-align: center; font-weight: 700; }
+    .pipeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 24px 0; }
+    .pipeline .stage { position: relative; min-height: 145px; padding: 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel); }
+    .pipeline .stage:nth-child(4n+1) { border-color: var(--accent); }
+    .pipeline .stage:nth-child(4n+2) { border-color: var(--accent-2); }
+    .pipeline .stage:nth-child(4n+3) { border-color: var(--warning); }
+    .pipeline .stage:nth-child(4n) { border-color: #c7a7ff; }
+    .stage-number { color: var(--accent); font-size: .8rem; font-weight: 800; letter-spacing: .1em; }
+    .stage strong { display: block; margin: 7px 0; }
+    .stage p { margin: 0; font-size: .9rem; }
+    .arch { overflow-x: auto; padding: 16px; background: #0b0e15; border-radius: 12px; }
+    .arch svg { display: block; min-width: 960px; width: 100%; height: auto; }
+    .arch .box { fill: #182239; stroke: #8eb5ff; stroke-width: 2; }
+    .arch .det { fill: #172a29; stroke: #8bf0c6; }
+    .arch .ai { fill: #1d2941; stroke: #8eb5ff; }
+    .arch .data { fill: #2a2417; stroke: #ffd27d; }
+    .arch .human { fill: #302719; stroke: #ffd27d; }
+    .arch .title { fill: #f4f6fb; font: 700 14px Inter,system-ui,sans-serif; }
+    .arch .sub { fill: #aab2c5; font: 11px Inter,system-ui,sans-serif; }
+    .arch .line { fill: none; stroke: #8eb5ff; stroke-width: 2; marker-end: url(#arrow); }
+    .arch .ai-line { fill: none; stroke: #8bf0c6; stroke-width: 2; marker-end: url(#arrow-green); }
+    .arch .data-line { fill: none; stroke: #ffd27d; stroke-width: 2; stroke-dasharray: 6 5; marker-end: url(#arrow-yellow); }
+    .legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 12px 0; color: var(--muted); font-size: .84rem; }
+    .legend span { display: inline-flex; align-items: center; gap: 7px; }
+    .swatch { width: 18px; height: 12px; border: 2px solid; border-radius: 3px; }
+    .metric { font-size: 2rem; color: var(--accent); font-weight: 800; line-height: 1.1; }
+    .metric-label { color: var(--muted); font-size: .9rem; }
+    .decision { border-left: 3px solid var(--accent-2); padding: 3px 0 3px 15px; margin: 14px 0; }
+    footer { margin-top: 62px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); }
+    @media (max-width: 850px) { .pipeline { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { main { padding: 24px 15px 60px; } .pipeline { grid-template-columns: 1fr; } h2 { font-size: 1.65rem; } }
+    @media print {
+      body { color: #111; background: white; }
+      main { max-width: none; padding: 0; }
+      .toc { display: none; }
+      p, li, td, .metric-label { color: #333; }
+      .card, table, pre, .callout, .diagram-shell { background: white; border-color: #bbb; }
+      h2, h3, a { color: #164a42; }
+      .arch { background: #f7f7f7; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">I-PostPilot | Technical Proposal | September 2026</div>
+    <h1>Multimodal Clip Intelligence</h1>
+    <p class="lead">
+      A performance-oriented technical architecture for converting long-form creator video into
+      timestamp-accurate, creator-aligned, platform-ready clip proposals. The system uses a
+      cascade of deterministic processing, multimodal candidate ranking, grounded generation,
+      and feedback-driven personalization.
+    </p>
+    <div class="meta">
+      <span class="tag green">Recommended architecture</span>
+      <span class="tag blue">Human-in-the-loop</span>
+      <span class="tag yellow">Evaluation-first</span>
+      <span class="tag red">No autonomous publishing</span>
+    </div>
+  </header>
+
+  <nav class="toc" aria-label="Document sections">
+    <a href="#executive">Executive decision</a>
+    <a href="#hypothesis">Hypothesis</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#pipeline">Pipeline</a>
+    <a href="#models">Model strategy</a>
+    <a href="#data">Data model</a>
+    <a href="#evaluation">Evaluation</a>
+    <a href="#delivery">Delivery plan</a>
+    <a href="#risks">Risks</a>
+  </nav>
+
+  <section id="executive">
+    <h2>1. Executive decision</h2>
+    <div class="callout">
+      <strong>Recommendation:</strong> Do not build an embedding-only or rules-only detector.
+      Build a cascade that generates a high-recall set of possible moments, aligns them to
+      transcript/audio/video boundaries, ranks them with creator-specific evidence, and uses a
+      strong multimodal model only for the top candidates.
+    </div>
+    <p>
+      The central product value is not “finding semantic changes.” It is reducing the time and
+      effort required to turn a long-form recording into clips the creator would actually publish.
+      Embeddings, rules, audio features, vision, and LLMs are therefore features in a ranking
+      system, not competing product strategies.
+    </p>
+    <div class="grid">
+      <div class="card"><div class="metric">Recall first</div><div class="metric-label">Generate enough candidate moments before ranking.</div></div>
+      <div class="card"><div class="metric">Multimodal</div><div class="metric-label">Text alone misses pauses, energy, visuals, and demonstrations.</div></div>
+      <div class="card"><div class="metric">Personalized</div><div class="metric-label">Approved and rejected examples define creator fit.</div></div>
+      <div class="card"><div class="metric">Measured</div><div class="metric-label">Compare against manual and simpler baselines.</div></div>
+    </div>
+  </section>
+
+  <section id="hypothesis">
+    <h2>2. Product hypothesis and falsification criteria</h2>
+    <p>
+      The technical system should test this falsifiable claim:
+    </p>
+    <div class="callout warning">
+      If I-PostPilot uses a creator's archive, multimodal content signals, and persistent feedback
+      to rank clip candidates, then creators will reach publishable clips faster than their normal
+      manual workflow without unacceptable loss of quality or voice.
+    </div>
+    <h3>What would disprove it?</h3>
+    <ul>
+      <li>Time-to-publish is not materially lower than manual selection.</li>
+      <li>Creators make major edits to most proposals.</li>
+      <li>Timestamp corrections are frequent enough to remove the time benefit.</li>
+      <li>Creator-specific archive and feedback data do not improve ranking over a generic baseline.</li>
+      <li>Creators do not want to reuse the workflow after testing it.</li>
+      <li>High-ranked candidates are not more likely to be accepted than lower-ranked candidates.</li>
+    </ul>
+    <h3>Primary success metrics</h3>
+    <table>
+      <thead><tr><th>Metric</th><th>Definition</th><th>Decision use</th></tr></thead>
+      <tbody>
+        <tr><td>Time to first publishable clip</td><td>Video available to creator-approved clip with valid boundaries.</td><td>Primary workflow efficiency measure.</td></tr>
+        <tr><td>Time to five clips</td><td>Elapsed time to five clips the creator would publish.</td><td>Tests batch usefulness, not just one lucky result.</td></tr>
+        <tr><td>Approval rate</td><td>Approved proposals divided by reviewed proposals.</td><td>Measures ranking quality and review burden.</td></tr>
+        <tr><td>Major-edit rate</td><td>Approved or edited clips requiring boundary or meaning changes.</td><td>Detects misleading “approval” results.</td></tr>
+        <tr><td>Reuse intent</td><td>Creator willingness to use the workflow again.</td><td>Tests product value beyond offline model scores.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="architecture">
+    <h2>3. Target system architecture</h2>
+    <p>
+      The architecture separates media truth, AI interpretation, ranking, and human decisions.
+      Every generated proposal must retain evidence back to source media and transcript words.
+    </p>
+    <div class="legend">
+      <span><i class="swatch" style="border-color:#8bf0c6;background:#172a29"></i> deterministic/media</span>
+      <span><i class="swatch" style="border-color:#8eb5ff;background:#1d2941"></i> AI intelligence</span>
+      <span><i class="swatch" style="border-color:#ffd27d;background:#2a2417"></i> persistence</span>
+      <span><i class="swatch" style="border-color:#ffd27d;background:#302719"></i> human review</span>
+    </div>
+    <div class="diagram-shell">
+      <div class="arch">
+        <svg viewBox="0 0 1120 590" role="img" aria-labelledby="archTitle archDesc">
+          <title id="archTitle">I-PostPilot technical architecture</title>
+          <desc id="archDesc">Media enters object storage and a workflow orchestrator. Deterministic media services produce audio, keyframes, and timestamps. AI services produce transcript, features, retrieval, ranking, and proposals. A creator review interface writes feedback back to the learning system.</desc>
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#8eb5ff"/></marker>
+            <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#8bf0c6"/></marker>
+            <marker id="arrow-yellow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#ffd27d"/></marker>
+          </defs>
+          <rect class="box" x="35" y="30" width="150" height="62" rx="12"/><text class="title" x="110" y="57" text-anchor="middle">Creator workspace</text><text class="sub" x="110" y="77" text-anchor="middle">upload + review</text>
+          <rect class="det" x="260" y="30" width="190" height="62" rx="12"/><text class="title" x="355" y="57" text-anchor="middle">API + workflow</text><text class="sub" x="355" y="77" text-anchor="middle">queues, retries, state</text>
+          <rect class="data" x="535" y="30" width="210" height="62" rx="12"/><text class="title" x="640" y="57" text-anchor="middle">Object storage</text><text class="sub" x="640" y="77" text-anchor="middle">video, audio, proxies</text>
+          <rect class="data" x="830" y="30" width="245" height="62" rx="12"/><text class="title" x="952" y="57" text-anchor="middle">PostgreSQL + pgvector</text><text class="sub" x="952" y="77" text-anchor="middle">metadata, archive, feedback</text>
+          <rect class="det" x="45" y="155" width="205" height="72" rx="12"/><text class="title" x="147" y="183" text-anchor="middle">Media normalization</text><text class="sub" x="147" y="204" text-anchor="middle">FFmpeg, metadata, proxies</text>
+          <rect class="ai" x="300" y="155" width="205" height="72" rx="12"/><text class="title" x="402" y="183" text-anchor="middle">Speech timeline</text><text class="sub" x="402" y="204" text-anchor="middle">ASR, words, speakers, VAD</text>
+          <rect class="ai" x="555" y="155" width="205" height="72" rx="12"/><text class="title" x="657" y="183" text-anchor="middle">Visual timeline</text><text class="sub" x="657" y="204" text-anchor="middle">shots, OCR, frames, faces</text>
+          <rect class="ai" x="810" y="155" width="235" height="72" rx="12"/><text class="title" x="927" y="183" text-anchor="middle">Archive intelligence</text><text class="sub" x="927" y="204" text-anchor="middle">retrieval + creator profile</text>
+          <rect class="ai" x="120" y="315" width="220" height="72" rx="12"/><text class="title" x="230" y="343" text-anchor="middle">Candidate generator</text><text class="sub" x="230" y="364" text-anchor="middle">15-90s aligned windows</text>
+          <rect class="ai" x="425" y="315" width="220" height="72" rx="12"/><text class="title" x="535" y="343" text-anchor="middle">Feature + ranker</text><text class="sub" x="535" y="364" text-anchor="middle">LTR + cross-encoder</text>
+          <rect class="ai" x="730" y="315" width="220" height="72" rx="12"/><text class="title" x="840" y="343" text-anchor="middle">Multimodal reranker</text><text class="sub" x="840" y="364" text-anchor="middle">top candidates only</text>
+          <rect class="human" x="425" y="470" width="220" height="72" rx="12"/><text class="title" x="535" y="498" text-anchor="middle">Creator review</text><text class="sub" x="535" y="519" text-anchor="middle">playback, edit, decision</text>
+          <rect class="det" x="730" y="470" width="220" height="72" rx="12"/><text class="title" x="840" y="498" text-anchor="middle">Validated output</text><text class="sub" x="840" y="519" text-anchor="middle">manifest, captions, report</text>
+          <path class="line" d="M185 61 H260"/><path class="line" d="M450 61 H535"/><path class="data-line" d="M745 61 H830"/>
+          <path class="line" d="M355 92 V135 H147 V155"/><path class="ai-line" d="M355 92 V135 H402 V155"/><path class="ai-line" d="M355 92 V135 H657 V155"/><path class="ai-line" d="M355 92 V135 H927 V155"/>
+          <path class="data-line" d="M147 227 V270 H230 V315"/><path class="ai-line" d="M402 227 V270 H230 V315"/><path class="ai-line" d="M657 227 V270 H230 V315"/><path class="ai-line" d="M927 227 V270 H230 V315"/>
+          <path class="ai-line" d="M340 351 H425"/><path class="ai-line" d="M645 351 H730"/><path class="ai-line" d="M840 387 V470 H645"/><path class="line" d="M535 387 V470"/><path class="line" d="M645 506 H730"/>
+          <path class="data-line" d="M535 542 V565 H952 V92"/><text class="sub" x="560" y="130" text-anchor="middle">shared evidence timeline</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section id="pipeline">
+    <h2>4. End-to-end processing pipeline</h2>
+    <div class="pipeline">
+      <div class="stage"><span class="stage-number">01 / INGEST</span><strong>Normalize media</strong><p>FFmpeg, ffprobe, loudness normalization, proxy generation, duration and codec validation.</p></div>
+      <div class="stage"><span class="stage-number">02 / SPEECH</span><strong>Build speech timeline</strong><p>Whisper large-v3 or managed ASR, word timestamps, speaker diarization, punctuation, confidence.</p></div>
+      <div class="stage"><span class="stage-number">03 / AUDIO</span><strong>Extract prosody</strong><p>VAD, pauses, energy, pitch, speech rate, laughter, applause, and interruption signals.</p></div>
+      <div class="stage"><span class="stage-number">04 / VIDEO</span><strong>Build visual timeline</strong><p>Shot boundaries, keyframes, OCR, slide/screen detection, faces, framing, and crop safety.</p></div>
+      <div class="stage"><span class="stage-number">05 / RETRIEVE</span><strong>Understand creator</strong><p>Hybrid search over individual archive examples, approvals, rejections, metadata, and performance.</p></div>
+      <div class="stage"><span class="stage-number">06 / GENERATE</span><strong>Create candidates</strong><p>Generate 15, 30, 45, 60, and 90 second windows aligned to words, pauses, sentences, and shots.</p></div>
+      <div class="stage"><span class="stage-number">07 / RANK</span><strong>Personalize ranking</strong><p>Transparent features first, then learning-to-rank and cross-encoder reranking as labels accumulate.</p></div>
+      <div class="stage"><span class="stage-number">08 / REVIEW</span><strong>Grounded proposals</strong><p>Multimodal LLM reviews top candidates, creates copy, validates evidence, and presents playback for approval.</p></div>
+    </div>
+    <h3>Candidate scoring principle</h3>
+    <pre><code>score =
+    narrative_score
+  + creator_match_score
+  + self_containedness
+  + audio_energy_score
+  + visual_context_score
+  + semantic_novelty
+  - context_dependency_penalty
+  - boundary_penalty
+  - transcript_uncertainty_penalty</code></pre>
+    <p>
+      The score is initially transparent and inspectable. After enough creator decisions,
+      replace or augment the fixed weights with a learning-to-rank model. Do not expose this
+      raw score as a probability called “confidence” until it has been calibrated.
+    </p>
+  </section>
+
+  <section id="models">
+    <h2>5. Technology and model strategy</h2>
+    <table>
+      <thead><tr><th>Capability</th><th>Recommended default</th><th>Alternatives</th><th>Why it belongs</th></tr></thead>
+      <tbody>
+        <tr><td>Media</td><td>FFmpeg + ffprobe</td><td>PyAV, MediaInfo</td><td>Reliable codec conversion, metadata, extraction, and render manifests.</td></tr>
+        <tr><td>ASR</td><td>Faster-Whisper / Whisper large-v3</td><td>Deepgram, AssemblyAI, Speechmatics</td><td>Word-level timestamps are the foundation for usable boundaries.</td></tr>
+        <tr><td>Diarization</td><td>pyannote.audio</td><td>Managed provider diarization</td><td>Prevents speaker-turn and question/answer boundary errors.</td></tr>
+        <tr><td>VAD/audio</td><td>Silero VAD + torchaudio/librosa</td><td>WebRTC VAD, Essentia, openSMILE</td><td>Finds natural starts, endings, pauses, and intensity changes.</td></tr>
+        <tr><td>Vision</td><td>PySceneDetect + sampled frames</td><td>TransNet V2, OpenCV</td><td>Limits expensive multimodal processing to meaningful moments.</td></tr>
+        <tr><td>Embeddings</td><td>Modern text embedding + CLIP/SigLIP where needed</td><td>BGE, E5, OpenCLIP, DINOv2</td><td>Retrieval and similarity features, not the sole quality signal.</td></tr>
+        <tr><td>Search</td><td>PostgreSQL + pgvector + full text</td><td>Qdrant, Weaviate, OpenSearch, Milvus</td><td>Combines application metadata, exact terms, and dense retrieval.</td></tr>
+        <tr><td>Ranking</td><td>Transparent weights, then LightGBM LambdaRank</td><td>XGBoost, CatBoost, pairwise Bradley-Terry</td><td>Creator decisions naturally form preference and ranking labels.</td></tr>
+        <tr><td>Generation</td><td>Strong managed multimodal model for top candidates</td><td>Qwen/Llama/Mistral through vLLM</td><td>Interprets narrative and visual context, then writes grounded proposals.</td></tr>
+        <tr><td>Validation</td><td>Pydantic/JSON Schema + deterministic policy checks</td><td>Typed structured-output SDKs</td><td>Prevents unsupported claims, malformed output, and invalid durations.</td></tr>
+      </tbody>
+    </table>
+    <div class="callout">
+      <strong>Important distinction:</strong> vLLM is an inference-serving engine, not an embedding
+      model or an LLM. It is appropriate when self-hosting a compatible generation model, but it
+      does not replace ASR, vector retrieval, ranking, or validation.
+    </div>
+  </section>
+
+  <section id="data">
+    <h2>6. Evidence and data model</h2>
+    <p>
+      The system must preserve a complete evidence graph. A proposal should be traceable from
+      generated title and captions back to candidate window, transcript words, audio/visual
+      events, archive examples, ranking features, and creator decision.
+    </p>
+    <pre><code>Creator
+  -> ArchiveItem
+      -> transcript, metadata, metrics, approved/rejected labels
+      -> embeddings and topic/style annotations
+  -> VideoAsset
+      -> word timestamps, speakers, shots, keyframes, audio features
+  -> CandidateWindow
+      -> start/end, transcript word IDs, feature vector, ranking scores
+  -> Proposal
+      -> generated copy, evidence references, model/prompt version
+  -> CreatorDecision
+      -> action, reason, edits, time spent, final boundary</code></pre>
+    <h3>Minimum archive inputs</h3>
+    <div class="grid">
+      <div class="card"><h3>Content</h3><ul><li>10-30 historical videos or transcripts</li><li>Published short clips and source ranges</li><li>Titles, descriptions, dates, platforms</li></ul></div>
+      <div class="card"><h3>Performance</h3><ul><li>Watch time and completion rate</li><li>Shares, saves, comments, follows</li><li>Audience size at publication</li></ul></div>
+      <div class="card"><h3>Preferences</h3><ul><li>Preferred duration and tone</li><li>Words/topics to avoid</li><li>Clickbait and context tolerance</li></ul></div>
+      <div class="card"><h3>Negative evidence</h3><ul><li>Rejected candidates and reasons</li><li>Major boundary edits</li><li>“Good for long-form” labels</li></ul></div>
+    </div>
+  </section>
+
+  <section id="evaluation">
+    <h2>7. Evaluation design</h2>
+    <p>
+      Model quality must be evaluated against workflows, not only similarity thresholds. Use a
+      fixed holdout set and compare the complete pipeline against strong, understandable baselines.
+    </p>
+    <ol class="sequence">
+      <li><strong>Manual baseline:</strong> creator selects clips using the normal workflow.</li>
+      <li><strong>Transcript baseline:</strong> sentence/keyword/rule candidates with manual review.</li>
+      <li><strong>Embedding baseline:</strong> semantic retrieval and topic-change candidates.</li>
+      <li><strong>Hybrid ranker:</strong> text, audio, visual, archive, and boundary features.</li>
+      <li><strong>Full system:</strong> hybrid ranker plus multimodal LLM reranking and grounded copy.</li>
+    </ol>
+    <table>
+      <thead><tr><th>Evaluation layer</th><th>Measures</th><th>Minimum evidence</th></tr></thead>
+      <tbody>
+        <tr><td>Boundary quality</td><td>Start/end correction rate, word alignment, context dependency.</td><td>Creator review plus sampled manual annotation.</td></tr>
+        <tr><td>Ranking quality</td><td>Precision@K, recall@K, NDCG, pairwise preference accuracy.</td><td>Accepted/rejected candidate labels.</td></tr>
+        <tr><td>Generation quality</td><td>Caption correction, unsupported claim rate, style match.</td><td>Schema checks and creator edits.</td></tr>
+        <tr><td>Workflow value</td><td>Time-to-first-clip, time-to-five-clips, review burden.</td><td>Timed sessions across creators and videos.</td></tr>
+        <tr><td>Business signal</td><td>Published clips, retention, reuse intent.</td><td>Post-publication metrics where available.</td></tr>
+      </tbody>
+    </table>
+    <div class="callout warning">
+      Do not claim “90% accuracy” for questions, audio energy, archive keywords, or fine-tuning
+      without a labeled test set. Precision is a measured result, not a property of a heuristic.
+    </div>
+  </section>
+
+  <section id="delivery">
+    <h2>8. Delivery plan</h2>
+    <table>
+      <thead><tr><th>Phase</th><th>Scope</th><th>Exit criteria</th></tr></thead>
+      <tbody>
+        <tr><td>Phase 0<br><span class="tag yellow">Evaluation foundation</span></td><td>Fix real/mock separation, Windows-safe paths, word-level evidence, persistent run manifests, timing logs.</td><td>A real run cannot be mistaken for a mock run; every candidate has valid start/end evidence.</td></tr>
+        <tr><td>Phase 1<br><span class="tag green">Useful MVP</span></td><td>Faster-Whisper, VAD, archive item storage, dense windows, transparent hybrid ranking, review UI.</td><td>Creator can review playback, adjust boundaries, and export a validated clip manifest.</td></tr>
+        <tr><td>Phase 2<br><span class="tag blue">Personalization</span></td><td>Approval/rejection taxonomy, hybrid retrieval, creator profile, pairwise ranking labels.</td><td>Holdout performance improves over generic and embedding-only baselines.</td></tr>
+        <tr><td>Phase 3<br><span class="tag blue">Multimodal quality</span></td><td>Shot detection, OCR, keyframes, audio prosody, top-K multimodal reranking.</td><td>Visual/audio signals reduce major edits without unacceptable latency or cost.</td></tr>
+        <tr><td>Phase 4<br><span class="tag green">Scale</span></td><td>Queues, object storage, observability, model versioning, optional rendering and publishing integrations.</td><td>Reliable batch processing with cost, latency, privacy, and audit controls.</td></tr>
+      </tbody>
+    </table>
+    <h3>Recommended production stack</h3>
+    <p>
+      Python and FastAPI; PostgreSQL with pgvector; Redis plus Celery, Dramatiq, or Temporal;
+      S3-compatible object storage; FFmpeg; Faster-Whisper; pyannote.audio; Silero VAD;
+      PySceneDetect; React/Next.js; Wavesurfer.js; OpenTelemetry; and a managed or vLLM-served
+      generation model depending on privacy, cost, and GPU constraints.
+    </p>
+  </section>
+
+  <section id="risks">
+    <h2>9. Risks and controls</h2>
+    <table>
+      <thead><tr><th>Risk</th><th>Impact</th><th>Control</th></tr></thead>
+      <tbody>
+        <tr><td>Bad timestamps</td><td>Creator loses trust; editing time increases.</td><td>Word-level timestamps, VAD, boundary snapping, sampled manual QA.</td></tr>
+        <tr><td>Generic archive profile</td><td>Proposals sound plausible but not like the creator.</td><td>Individual archive records, approvals/rejections, performance metadata.</td></tr>
+        <tr><td>LLM hallucination</td><td>Captions misrepresent the source.</td><td>Grounding references, transcript checks, schema and claim validation.</td></tr>
+        <tr><td>Ranking overfit</td><td>One creator/run improves while holdout performance falls.</td><td>Fixed holdout sets, conservative updates, model/prompt versioning.</td></tr>
+        <tr><td>Cost and latency</td><td>Multimodal analysis becomes impractical at scale.</td><td>Cascade architecture; expensive models only for top candidates.</td></tr>
+        <tr><td>Privacy and rights</td><td>Creator content or API data is exposed.</td><td>Explicit provider policy, retention controls, encryption, deletion, local option.</td></tr>
+        <tr><td>False confidence</td><td>Creators overtrust arbitrary scores.</td><td>Use named ranking scores until calibration is demonstrated.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>10. Final recommendation</h2>
+    <div class="callout">
+      <strong>Build the evaluation-ready cascade first.</strong> The winning implementation is not
+      the one with the largest model. It is the one that produces accurate boundaries, finds
+      complete and publishable moments, adapts to each creator, explains its evidence, and
+      demonstrably reduces time-to-publish against a manual baseline.
+    </div>
+    <div class="decision"><strong>Near term:</strong> transcript + audio + archive retrieval + transparent hybrid ranking.</div>
+    <div class="decision"><strong>Next:</strong> persistent feedback and learning-to-rank from creator preferences.</div>
+    <div class="decision"><strong>Then:</strong> visual intelligence and multimodal reranking for the top candidates.</div>
+    <div class="decision"><strong>Later:</strong> rendering, publishing integrations, shared models, and creator-specific adapters.</div>
+  </section>
+
+  <footer>
+    <strong>I-PostPilot Technical Proposal</strong><br>
+    Companion to the product envisioning document. This proposal intentionally prioritizes
+    measurable workflow value, traceability, creator control, and behavior-safe system evolution.
+  </footer>
+</main>
+</body>
+</html>

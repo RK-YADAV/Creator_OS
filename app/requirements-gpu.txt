@@ -1,0 +1,13 @@
+# Install requirements.txt first.
+# Install a CUDA-enabled PyTorch build separately, matching the VM driver:
+#   pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu128
+
+faster-whisper>=1.2.0
+sentence-transformers>=5.1.0
+silero-vad>=6.0.0
+soundfile>=0.13.1
+opencv-python-headless>=4.10.0
+scenedetect[opencv]>=0.6.7
+
+# Optional: requires accepting the model terms on Hugging Face and setting HF_TOKEN.
+# pyannote.audio>=3.4.0

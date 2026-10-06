@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>I-PostPilot | MVP Hypothesis Proof</title>
+  <style>
+    :root{--bg:#080b11;--panel:#121824;--panel2:#1b2434;--text:#f3f6fb;--muted:#aab4c8;--green:#8bf0c6;--blue:#8eb5ff;--yellow:#ffd27d;--red:#ff9b9b;--purple:#c7a7ff;--border:#2d3a50;--code:#0b1019}
+    *{box-sizing:border-box}html,body{height:100%}body{margin:0;color:var(--text);background:radial-gradient(circle at 80% 0,#1c2946 0,var(--bg) 48rem);font:16px/1.55 Inter,ui-sans-serif,system-ui,sans-serif;overflow:hidden}
+    .deck{height:100vh;display:flex;flex-direction:column}.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 22px;border-bottom:1px solid var(--border);background:rgba(8,11,17,.92)}.brand{color:var(--green);font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:.76rem}.controls{display:flex;align-items:center;gap:7px}button{color:var(--muted);background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:7px 11px;cursor:pointer}button:hover,button:focus-visible{color:#07130f;background:var(--green);border-color:var(--green);outline:0}#counter{min-width:58px;text-align:center;color:var(--muted);font-size:.86rem}.progress{height:3px;background:var(--panel2)}.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--blue));transition:width .25s}
+    .slides{flex:1;position:relative;overflow:hidden}.slide{display:none;height:100%;overflow:auto;padding:clamp(28px,5vw,72px) clamp(22px,7vw,110px) 80px}.slide.active{display:block;animation:enter .18s ease-out}@keyframes enter{from{opacity:.1;transform:translateX(12px)}to{opacity:1;transform:none}}
+    .eyebrow{color:var(--green);text-transform:uppercase;letter-spacing:.16em;font-size:.76rem;font-weight:800}h1{margin:12px 0 20px;max-width:1050px;font-size:clamp(2.4rem,7vw,6.3rem);line-height:.98;letter-spacing:-.065em}h2{margin:0 0 22px;max-width:1000px;color:var(--green);font-size:clamp(2rem,4vw,4rem);line-height:1.02;letter-spacing:-.045em}h3{color:var(--blue);margin:20px 0 8px}p,li{color:var(--muted)}strong{color:var(--text)}.lead{max-width:920px;font-size:clamp(1.1rem,2vw,1.45rem)}
+    .tag{display:inline-block;padding:4px 9px;border-radius:999px;font-size:.75rem;font-weight:800;margin:3px 4px 3px 0}.green{color:#06150f;background:var(--green)}.blue{color:#081329;background:var(--blue)}.yellow{color:#241807;background:var(--yellow)}.red{color:#2b0b0b;background:var(--red)}.purple{color:#170b2b;background:var(--purple)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:14px}.card{padding:17px;border:1px solid var(--border);border-radius:13px;background:rgba(18,24,36,.92)}.card h3{margin-top:0}.card ul{padding-left:20px;margin-bottom:0}.callout{margin:18px 0;padding:16px 19px;border-left:4px solid var(--green);border-radius:10px;background:rgba(18,24,36,.92)}.callout.warn{border-color:var(--yellow)}.callout.risk{border-color:var(--red)}
+    .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin:22px 0}.node{flex:1 1 145px;min-height:82px;padding:13px;border:1px solid var(--border);border-radius:10px;background:var(--panel)}.node:nth-child(4n+1){border-color:var(--green)}.node:nth-child(4n+2){border-color:var(--blue)}.node:nth-child(4n+3){border-color:var(--yellow)}.node:nth-child(4n){border-color:var(--purple)}.arrow{align-self:center;color:var(--blue);font-size:1.4rem}
+    pre{margin:12px 0;padding:15px;overflow:auto;color:#dce6ff;border:1px solid var(--border);border-radius:11px;background:var(--code);font-size:.86rem}table{width:100%;border-collapse:collapse;margin:15px 0;border:1px solid var(--border)}th,td{padding:11px 13px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}th{color:var(--text);background:var(--panel2)}td{color:var(--muted)}tr:last-child td{border-bottom:0}.metric{font-size:2.2rem;color:var(--green);font-weight:800}.footer-note{position:fixed;bottom:9px;left:22px;color:#71809a;font-size:.75rem}
+    @media(max-width:800px){.slide{padding:28px 20px 70px}}@media print{body{overflow:visible;background:white;color:#111}.topbar,.progress,.footer-note{display:none}.slides{overflow:visible}.slide,.slide.active{display:block;min-height:100vh;page-break-after:always;padding:32px}p,li,td{color:#333}.card,.callout,pre,th{background:white;border-color:#aaa}h2,h3{color:#164a42}}
+  </style>
+</head>
+<body>
+<div class="deck">
+  <div class="topbar"><div class="brand">I-PostPilot / MVP Hypothesis Proof</div><div class="controls"><button id="prev">←</button><span id="counter">1 / 13</span><button id="next">→</button><button id="print">Print</button></div></div>
+  <div class="progress"><span id="progress"></span></div>
+  <main class="slides">
+    <section class="slide active">
+      <div class="eyebrow">Current implementation | September 2026</div>
+      <h1>From long-form video to creator-reviewed clips.</h1>
+      <p class="lead">This deck explains what the current I-PostPilot MVP proves, how the application works, and which evidence is still required before claiming creator-level quality.</p>
+      <div><span class="tag green">Operational vertical slice</span><span class="tag blue">Original creator footage</span><span class="tag yellow">Human review</span><span class="tag red">Not yet production intelligence</span></div>
+      <div class="callout"><strong>Current thesis:</strong> creator examples and approved persona rules can make clip discovery and production more structured, faster, and more reviewable than manually scanning a long-form video.</div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">01 / Hypothesis</div><h2>What the MVP is trying to prove</h2>
+      <div class="callout"><strong>Hypothesis:</strong> Given a long-form video, historical creator examples, and human review, I-PostPilot can reduce the time needed to find acceptable short-form clips while preserving the creator's content and style signals.</div>
+      <div class="grid"><div class="card"><h3>Independent inputs</h3><ul><li>Creator preferences and editable persona.</li><li>Approved and rejected Shorts/Reels.</li><li>Long-form video with or without transcript.</li></ul></div><div class="card"><h3>Observable outputs</h3><ul><li>Ranked candidate windows.</li><li>Sentence-aware transcript.</li><li>Rendered 9:16 MP4 with captions.</li><li>Creator approval, rejection, and feedback.</li></ul></div><div class="card"><h3>Success evidence</h3><ul><li>Top candidates are acceptable.</li><li>Review time decreases.</li><li>Fewer timestamp corrections.</li><li>Creator-style choices are explainable.</li></ul></div></div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">02 / Build setup</div><h2>The setup used to test the hypothesis</h2>
+      <p class="lead">The MVP was intentionally built as a small, observable evaluation system rather than a fully autonomous production platform.</p>
+      <div class="grid"><div class="card"><h3>Runtime</h3><ul><li>FastAPI backend running on a GPU-enabled Ubuntu VM.</li><li>Browser-based workflow for creator setup and review.</li><li>SQLite for experiment records and filesystem artifacts for media.</li></ul></div><div class="card"><h3>Media and AI stack</h3><ul><li>FFmpeg/ffprobe for validation, normalization, and rendering.</li><li>Faster-Whisper for timestamped transcription.</li><li>OpenCV and deterministic scoring for lightweight visual and narrative signals.</li></ul></div><div class="card"><h3>Test design</h3><ul><li>Creator examples labeled approved or rejected.</li><li>Editable persona with an approval gate.</li><li>Ranked candidates followed by human approval, rejection, and annotation.</li></ul></div></div>
+      <div class="callout"><strong>Why this setup:</strong> every important step is inspectable: inputs, profile signals, candidate rationale, timestamps, rendered output, and human feedback are all recorded so the hypothesis can be challenged rather than assumed.</div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">03 / Architecture</div><h2>Current application architecture</h2>
+      <div class="flow"><div class="node"><strong>Browser UI</strong><br>Upload, profile review, candidate review, render preview</div><div class="arrow">→</div><div class="node"><strong>FastAPI</strong><br>Creators, examples, jobs, proposals, feedback, render APIs</div><div class="arrow">→</div><div class="node"><strong>Pipeline</strong><br>Normalization, ASR, segmentation, ranking, captions, rendering</div><div class="arrow">→</div><div class="node"><strong>Artifacts</strong><br>SQLite records, uploaded media, cached proxies, MP4/SRT/VTT</div></div>
+      <pre>Browser
+  └── FastAPI application
+        ├── Flow 1: creator + examples + profile approval
+        ├── Flow 2: video/transcript + background job
+        ├── Media boundary: ffprobe/ffmpeg normalization
+        ├── ASR: Faster-Whisper, CUDA or explicit CPU fallback
+        ├── Analysis: OpenCV visual signals + narrative scoring
+        └── Output: ranked proposals + captions + rendered clip
+
+SQLite: creators | creator_examples | jobs | proposals | feedback
+Filesystem: source uploads | normalized analysis proxies | rendered assets</pre>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">04 / Flow 1</div><h2>How the creator persona is built</h2>
+      <div class="flow"><div class="node"><strong>1. Create creator</strong><br>Languages, preferred duration, optional tone/energy/style defaults</div><div class="arrow">→</div><div class="node"><strong>2. Add examples</strong><br>Short/Reel video + transcript, labeled approved or rejected</div><div class="arrow">→</div><div class="node"><strong>3. Build profile</strong><br>Terms, hooks, speech/pause signals, visual averages, persona defaults</div><div class="arrow">→</div><div class="node"><strong>4. Review + approve</strong><br>Creator can edit persona JSON before personalization is enabled</div></div>
+      <pre>{
+  "persona": {
+    "voice": {"tone": "direct, conversational", "energy": "medium"},
+    "storytelling": {"hook_types": ["question"], "structure": ["hook","context","insight","takeaway"]},
+    "caption_style": {"words_per_line": 4, "position": "lower-center"},
+    "brand": {}
+  }
+}</pre>
+      <div class="callout warn"><strong>Interpretation:</strong> this is an evidence-backed transparent baseline, not a learned clone of the creator's identity.</div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">05 / Flow 2</div><h2>How a new video becomes candidates</h2>
+      <div class="flow"><div class="node"><strong>Ingest</strong><br>Video only, transcript file, or pasted transcript</div><div class="arrow">→</div><div class="node"><strong>Normalize</strong><br>Detect AV1/H.264 issues; create audio-preserving H.264/yuv420p proxy</div><div class="arrow">→</div><div class="node"><strong>Transcribe</strong><br>Faster-Whisper with VAD, word timestamps, CUDA/CPU fallback</div><div class="arrow">→</div><div class="node"><strong>Segment</strong><br>Merge ASR segments toward complete sentence windows</div><div class="arrow">→</div><div class="node"><strong>Rank</strong><br>Topic, duration, hook, visual fit, narrative completeness</div></div>
+      <div class="grid"><div class="card"><div class="metric">3</div><p>Input modes: video, transcript, or pasted text</p></div><div class="card"><div class="metric">9:16</div><p>Default social-video render format</p></div><div class="card"><div class="metric">2</div><p>Human feedback actions: approve and reject, plus edit feedback</p></div></div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">06 / Output</div><h2>The current application produces clips, not only transcripts.</h2>
+      <div class="grid"><div class="card"><h3>Candidate review</h3><ul><li>Ranked proposal cards.</li><li>Timestamp range and transcript.</li><li>Confidence and rationale.</li><li>Narrative completeness signal.</li></ul></div><div class="card"><h3>Social-ready render</h3><ul><li>Portrait 9:16 MP4.</li><li>H.264 video + AAC audio.</li><li>Burned-in captions by default.</li><li>Browser preview and download.</li></ul></div><div class="card"><h3>Caption artifacts</h3><ul><li>Word-timed SRT endpoint.</li><li>Word-timed VTT endpoint.</li><li>Fallback timing for pasted transcripts.</li></ul></div></div>
+      <pre>POST /api/jobs
+GET  /api/jobs/{job_id}
+POST /api/proposals/{proposal_id}/render
+GET  /api/proposals/{proposal_id}/captions.srt
+GET  /api/proposals/{proposal_id}/captions.vtt
+POST /api/proposals/{proposal_id}/feedback</pre>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">07 / Evidence from current run</div><h2>What has been demonstrated</h2>
+      <table><tr><th>Capability</th><th>Observed result</th><th>Status</th></tr><tr><td>Video-only ingestion</td><td>Long-form video completed through ASR and job processing.</td><td><span class="tag green">Working</span></td></tr><tr><td>Codec resilience</td><td>AV1/H.264 problems trigger normalized proxy handling rather than stopping visual analysis.</td><td><span class="tag green">Working</span></td></tr><tr><td>ASR resilience</td><td>CUDA library failure is surfaced and can use explicit CPU fallback mode.</td><td><span class="tag yellow">Working, slower</span></td></tr><tr><td>Clip rendering</td><td>Candidate can be rendered, previewed, and downloaded as MP4.</td><td><span class="tag green">Working</span></td></tr><tr><td>Creator alignment</td><td>Profile-aware ranking and visual/text signals are applied; creator acceptance still needs measurement.</td><td><span class="tag blue">Test required</span></td></tr></table>
+      <div class="callout"><strong>Important:</strong> the MVP proves an executable workflow and measurable review surface. It does not yet prove that every ranked clip is publishable or stylistically indistinguishable from the creator.</div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">08 / Honest limitations</div><h2>What the current run exposed</h2>
+      <div class="grid"><div class="card"><h3>Boundary quality</h3><p>Older runs included fragments such as clips beginning with “so”, “because”, or a partial thought. Sentence-aware merging improves this, but word-level boundary evaluation is still required.</p></div><div class="card"><h3>Persona depth</h3><p>The persona is structured and editable, but most inferred values are deterministic aggregates rather than a trained creator-specific model.</p></div><div class="card"><h3>Visual fidelity</h3><p>Current visual matching uses lightweight brightness, contrast, aspect ratio, scene, and optional face signals—not learned visual embeddings or editing-rhythm models.</p></div><div class="card"><h3>GPU performance</h3><p>If CUDA is unavailable, CPU fallback preserves functionality but invalidates GPU throughput claims until the runtime is repaired.</p></div></div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">09 / Proof protocol</div><h2>How to prove the hypothesis with the current version</h2>
+      <ol><li><strong>Prepare archive:</strong> 5–10 approved and 3–5 rejected examples with matching transcripts.</li><li><strong>Build and approve persona:</strong> record profile version and selected rules.</li><li><strong>Run the same long-form video three ways:</strong> generic ranking, profile text ranking, profile text + visual ranking.</li><li><strong>Render the top 10:</strong> use the same 9:16 and caption settings.</li><li><strong>Human review:</strong> creator marks approve, reject, or edit and records time-to-first-acceptable clip.</li><li><strong>Compare:</strong> top-1/top-3 acceptance, correction count, review time, and rejection reasons.</li></ol>
+      <table><tr><th>Metric</th><th>Evidence threshold to discuss</th></tr><tr><td>Top-3 acceptance</td><td>Personalized ranking should beat generic ranking on the same source.</td></tr><tr><td>Review time</td><td>Creator reaches the first acceptable clip faster than manual scanning.</td></tr><tr><td>Boundary corrections</td><td>Fewer start/end edits after sentence-aware segmentation.</td></tr><tr><td>Style feedback</td><td>Creator can explain why the clip feels aligned or misaligned.</td></tr></table>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">10 / Current user journey</div><h2>What a demo can show today</h2>
+      <div class="flow"><div class="node"><strong>Create</strong><br>Creator profile and preferences</div><div class="arrow">→</div><div class="node"><strong>Teach</strong><br>Upload approved/rejected examples</div><div class="arrow">→</div><div class="node"><strong>Approve</strong><br>Edit persona JSON and approve</div><div class="arrow">→</div><div class="node"><strong>Find</strong><br>Upload long-form video and generate ranked clips</div><div class="arrow">→</div><div class="node"><strong>Watch</strong><br>Render 9:16 preview with captions</div><div class="arrow">→</div><div class="node"><strong>Decide</strong><br>Approve, reject, annotate, export</div></div>
+      <div class="callout"><strong>Demo claim:</strong> “I-PostPilot turns creator examples into an explicit reviewable profile, uses it to rank candidate moments, and delivers playable clips for human approval.”</div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">11 / Conclusion</div><h2>The MVP has crossed from concept to testable product.</h2>
+      <div class="grid"><div class="card"><h3>Proven now</h3><ul><li>End-to-end media-to-clip workflow.</li><li>Resilient media normalization.</li><li>Creator profile approval gate.</li><li>Sentence-aware candidates.</li><li>Rendered, captioned social clip output.</li></ul></div><div class="card"><h3>Next proof, not more features</h3><ul><li>Run controlled generic vs personalized comparison.</li><li>Collect creator approvals and rejection reasons.</li><li>Measure review time and corrections.</li><li>Repair CUDA before claiming GPU performance.</li></ul></div></div>
+      <div class="callout"><strong>Bottom line:</strong> the current version can demonstrate the core hypothesis as a measurable workflow. The remaining question is no longer “can it produce clips?” but “does the creator prefer its clips, and does it save meaningful review time?”</div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">12 / Fellow-user feedback</div><h2>What reviewers should help us validate next</h2>
+      <p class="lead">The final proof point is not whether the pipeline runs. It is whether creators and fellow users find the results useful, understandable, and close enough to their publishing style.</p>
+      <div class="grid"><div class="card"><h3>What worked</h3><p>Did ranked candidates reduce the effort of scanning a long-form video? Were the rendered clips and captions easier to review than transcript-only suggestions?</p></div><div class="card"><h3>What needs improvement</h3><p>Did any clip start with an incomplete thought, miss important context, or feel mismatched with the creator's tone, pacing, framing, or caption style?</p></div><div class="card"><h3>What to record</h3><p>For each reviewer, capture the clip tested, approve/reject decision, rejection reason, timestamp corrections, and time to find the first acceptable clip.</p></div></div>
+      <table><tr><th>Feedback theme</th><th>How it challenges the hypothesis</th><th>Next action</th></tr><tr><td>Faster discovery</td><td>Supports the time-saving claim if users reach an acceptable clip sooner.</td><td>Compare review time with manual scanning.</td></tr><tr><td>Context and boundaries</td><td>Shows whether sentence-aware segmentation produces publishable moments.</td><td>Track start/end corrections and rejected fragments.</td></tr><tr><td>Persona alignment</td><td>Tests whether the profile changes rankings in a way users recognize.</td><td>Collect style-specific feedback and improve creator signals.</td></tr></table>
+      <div class="callout"><strong>Closing message:</strong> user feedback turns this from an operational demo into a credible hypothesis test. Positive feedback is evidence; negative feedback is the roadmap for improving the ranking and persona model.</div>
+    </section>
+  </main>
+  <div class="footer-note">I-PostPilot · MVP hypothesis proof · Human review remains the ground truth</div>
+</div>
+<script>
+  const slides=[...document.querySelectorAll(".slide")],counter=document.querySelector("#counter"),bar=document.querySelector("#progress");let index=0;
+  function show(next){index=(next+slides.length)%slides.length;slides.forEach((s,i)=>s.classList.toggle("active",i===index));counter.textContent=`${index+1} / ${slides.length}`;bar.style.width=`${((index+1)/slides.length)*100}%`;document.querySelector(".slides").scrollTop=0}
+  document.querySelector("#next").onclick=()=>show(index+1);document.querySelector("#prev").onclick=()=>show(index-1);document.querySelector("#print").onclick=()=>window.print();document.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key===" "){e.preventDefault();show(index+1)}if(e.key==="ArrowLeft"){e.preventDefault();show(index-1)}});
+  show(0);
+</script>
+</body>
+</html>

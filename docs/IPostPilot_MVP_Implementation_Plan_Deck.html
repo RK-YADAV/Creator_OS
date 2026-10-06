@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>I-PostPilot | MVP Implementation Plan</title>
+  <style>
+    :root{--bg:#080b11;--panel:#121824;--panel2:#1b2434;--text:#f3f6fb;--muted:#aab4c8;--green:#8bf0c6;--blue:#8eb5ff;--yellow:#ffd27d;--red:#ff9b9b;--purple:#c7a7ff;--border:#2d3a50;--code:#0b1019}
+    *{box-sizing:border-box}html,body{height:100%}body{margin:0;color:var(--text);background:radial-gradient(circle at 80% 0,#1c2946 0,var(--bg) 48rem);font:16px/1.55 Inter,ui-sans-serif,system-ui,sans-serif;overflow:hidden}
+    .deck{height:100vh;display:flex;flex-direction:column}.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 22px;border-bottom:1px solid var(--border);background:rgba(8,11,17,.9)}.brand{color:var(--green);font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:.76rem}.controls{display:flex;align-items:center;gap:7px}button{color:var(--muted);background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:7px 11px;cursor:pointer}button:hover,button:focus-visible{color:#07130f;background:var(--green);border-color:var(--green);outline:0}#counter{min-width:58px;text-align:center;color:var(--muted);font-size:.86rem}.progress{height:3px;background:var(--panel2)}.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--blue));transition:width .25s}
+    .slides{flex:1;position:relative;overflow:hidden}.slide{display:none;height:100%;overflow:auto;padding:clamp(28px,5vw,72px) clamp(22px,7vw,110px) 80px}.slide.active{display:block;animation:enter .18s ease-out}@keyframes enter{from{opacity:.1;transform:translateX(12px)}to{opacity:1;transform:none}}
+    .eyebrow{color:var(--green);text-transform:uppercase;letter-spacing:.16em;font-size:.76rem;font-weight:800}h1{margin:12px 0 20px;max-width:1000px;font-size:clamp(2.4rem,7vw,6.3rem);line-height:.98;letter-spacing:-.065em}h2{margin:0 0 22px;max-width:1000px;color:var(--green);font-size:clamp(2rem,4vw,4rem);line-height:1.02;letter-spacing:-.045em}h3{color:var(--blue);margin:20px 0 8px}p,li{color:var(--muted)}strong{color:var(--text)}.lead{max-width:920px;font-size:clamp(1.1rem,2vw,1.45rem)}.subtle{color:var(--muted);font-size:.9rem}
+    .tag{display:inline-block;padding:4px 9px;border-radius:999px;font-size:.75rem;font-weight:800;margin:3px 4px 3px 0}.green{color:#06150f;background:var(--green)}.blue{color:#081329;background:var(--blue)}.yellow{color:#241807;background:var(--yellow)}.red{color:#2b0b0b;background:var(--red)}.purple{color:#170b2b;background:var(--purple)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:14px}.card{padding:17px;border:1px solid var(--border);border-radius:13px;background:rgba(18,24,36,.92)}.card h3{margin-top:0}.card ul{padding-left:20px;margin-bottom:0}.callout{margin:18px 0;padding:16px 19px;border-left:4px solid var(--green);border-radius:10px;background:rgba(18,24,36,.92)}.callout.warn{border-color:var(--yellow)}.callout.risk{border-color:var(--red)}
+    .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin:22px 0}.node{flex:1 1 145px;min-height:82px;padding:13px;border:1px solid var(--border);border-radius:10px;background:var(--panel)}.node:nth-child(4n+1){border-color:var(--green)}.node:nth-child(4n+2){border-color:var(--blue)}.node:nth-child(4n+3){border-color:var(--yellow)}.node:nth-child(4n){border-color:var(--purple)}.arrow{align-self:center;color:var(--blue);font-size:1.4rem}
+    .pipeline{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin:20px 0}.stage{min-height:125px;padding:14px;border:1px solid var(--border);border-radius:11px;background:var(--panel)}.stage:nth-child(4n+1){border-color:var(--green)}.stage:nth-child(4n+2){border-color:var(--blue)}.stage:nth-child(4n+3){border-color:var(--yellow)}.stage:nth-child(4n){border-color:var(--purple)}.stage b{display:block;color:var(--green);font-size:.76rem;letter-spacing:.1em}.stage strong{display:block;margin:6px 0}.stage p{margin:0;font-size:.88rem}
+    .component{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px}.component>div{padding:16px;border:1px solid var(--border);border-radius:12px;background:rgba(18,24,36,.9)}.component h3{margin-top:0;font-size:1rem}.component ul{margin:0;padding-left:19px}
+    pre{margin:12px 0;padding:15px;overflow:auto;color:#dce6ff;border:1px solid var(--border);border-radius:11px;background:var(--code);font-size:.86rem}code{color:#dce6ff}table{width:100%;border-collapse:collapse;margin:15px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden}th,td{padding:11px 13px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}th{color:var(--text);background:var(--panel2)}td{color:var(--muted)}tr:last-child td{border-bottom:0}
+    .legend{display:flex;flex-wrap:wrap;gap:7px 16px;margin:14px 0;color:var(--muted);font-size:.85rem}.legend span{display:inline-flex;align-items:center;gap:7px}.swatch{width:18px;height:12px;border:2px solid;border-radius:3px}.flowlist{list-style:none;padding:0;counter-reset:item}.flowlist li{counter-increment:item;position:relative;padding:10px 14px 10px 48px;margin:8px 0;background:var(--panel);border-radius:9px}.flowlist li:before{content:counter(item);position:absolute;left:14px;top:10px;width:24px;height:24px;border-radius:50%;background:var(--green);color:#07130f;text-align:center;font-weight:800}
+    .footer-note{position:fixed;bottom:9px;left:22px;color:#71809a;font-size:.75rem}@media(max-width:800px){.component{grid-template-columns:1fr}.pipeline{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.topbar{padding:10px 12px}.slide{padding:28px 16px 70px}.pipeline{grid-template-columns:1fr}}@media print{body{overflow:visible;background:white;color:#111}.topbar,.progress,.footer-note{display:none}.slides{overflow:visible}.slide,.slide.active{display:block;min-height:100vh;page-break-after:always;padding:32px}p,li,td{color:#333}.card,.callout,table,pre,.component>div,.stage,.node{background:white;border-color:#aaa}h2,h3{color:#164a42}}
+  </style>
+</head>
+<body>
+<div class="deck">
+  <div class="topbar"><div class="brand">I-PostPilot / MVP Implementation Plan</div><div class="controls"><button id="prev" aria-label="Previous slide">←</button><span id="counter">1 / 14</span><button id="next" aria-label="Next slide">→</button><button id="print">Print</button></div></div>
+  <div class="progress"><span id="progress"></span></div>
+  <main class="slides">
+    <section class="slide active">
+      <div class="eyebrow">File-based MVP | JarvisLabs GPU | September 2026</div>
+      <h1>Build the smallest system that can prove the workflow.</h1>
+      <p class="lead">An implementation plan for a real, rendered-video MVP that uses one Python application, filesystem artifacts, an RTX PRO 6000 GPU, FFmpeg, and selective AI API access—without a database or complex infrastructure.</p>
+      <div><span class="tag green">GPU-first</span><span class="tag blue">Web review</span><span class="tag yellow">JSON artifacts</span><span class="tag red">Human approval</span></div>
+      <div class="callout"><strong>Core decision:</strong> omit infrastructure complexity, not experimental discipline. The MVP must still preserve timestamps, render real clips, persist decisions, and measure workflow improvement.</div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">01 / Executive summary</div><h2>What this MVP is designed to prove</h2>
+      <div class="callout"><strong>Hypothesis:</strong> Given a long-form video, creator examples, and human review, I-PostPilot can help a creator reach acceptable YouTube Shorts and Instagram Reels faster than their manual workflow.</div>
+      <div class="grid"><div class="card"><h3>Inputs</h3><ul><li>Long-form MP4.</li><li>Optional transcript.</li><li>Creator onboarding answers and archive examples.</li><li>Platform and language settings.</li></ul></div><div class="card"><h3>Outputs</h3><ul><li>Versioned creator skill profile for approval.</li><li>Candidate windows.</li><li>Rendered 9:16 MP4 previews.</li><li>Captions, titles, evidence, and decisions.</li></ul></div><div class="card"><h3>Success measures</h3><ul><li>Time to first publishable clip.</li><li>Time to five clips.</li><li>Approval and major-edit rates.</li><li>Timestamp correction rate.</li></ul></div></div>
+      <h3>What is deliberately excluded</h3><p>Multi-tenant production infrastructure, autonomous publishing, fine-tuning, complex billing, and database-backed scale. These are roadmap items, not prerequisites for the experiment.</p>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">02 / Working mechanism</div><h2>High-level MVP flow</h2>
+      <div class="flow"><div class="node"><strong>1. Onboard + upload</strong><br><span class="subtle">preferences, examples, MP4, transcript</span></div><div class="arrow">→</div><div class="node"><strong>2. Build profile</strong><br><span class="subtle">generate, edit, approve skill profile</span></div><div class="arrow">→</div><div class="node"><strong>3. Understand</strong><br><span class="subtle">ASR (speech-to-text), speakers, audio, scenes</span></div><div class="arrow">→</div><div class="node"><strong>4. Find + generate</strong><br><span class="subtle">ranked clips, titles/captions, evidence</span></div><div class="arrow">→</div><div class="node"><strong>5. Render</strong><br><span class="subtle">real 9:16 previews</span></div><div class="arrow">→</div><div class="node"><strong>6. Review</strong><br><span class="subtle">approve, edit, reject</span></div></div>
+      <pre><code>Browser
+  -> lightweight Python web app
+  -> one processing job on JarvisLabs GPU
+  -> filesystem artifacts
+  -> rendered previews in browser
+  -> JSON feedback and export</code></pre>
+      <div class="callout warn"><strong>Experiment boundary:</strong> the creator judges rendered clips, not only text proposals. The workflow must expose the actual time saved and the corrections still required.</div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">03 / Working mechanism</div><h2>Flow 1 — Media-to-evidence pipeline</h2>
+      <p>Flow 1 transforms the source video into a reusable evidence timeline. Each stage writes an artifact so later stages can be rerun without repeating expensive GPU work.</p>
+      <div class="pipeline"><div class="stage"><b>01 / INTAKE</b><strong>Validate input</strong><p>File, codec, audio, duration, transcript, disk.</p></div><div class="stage"><b>02 / MEDIA</b><strong>Normalize</strong><p>WAV (working audio), proxy MP4 (lighter video), metadata, fingerprint.</p></div><div class="stage"><b>03 / SPEECH</b><strong>Transcribe</strong><p>ASR converts speech to text with word timestamps, language, speakers, and confidence.</p></div><div class="stage"><b>04 / AUDIO</b><strong>Analyze sound</strong><p>VAD (voice activity detection), pauses, energy, speech rate, events.</p></div><div class="stage"><b>05 / VIDEO</b><strong>Analyze frames</strong><p>Shots, keyframes, OCR, framing, crop safety.</p></div><div class="stage"><b>06 / CREATOR</b><strong>Build skill profile</strong><p>Analyze examples, generate profile, creator edits and approves.</p></div><div class="stage"><b>07 / CACHE</b><strong>Register artifacts</strong><p>Manifest, versions, profile status, warnings.</p></div><div class="stage"><b>OUTPUT</b><strong>Evidence timeline</strong><p>Reusable JSON artifacts plus approved creator profile for Flow 2.</p></div></div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">04 / Pipeline 1 components</div><h2>Flow 1 — Technical components and contracts</h2>
+      <div class="component"><div><h3>Local deterministic</h3><ul><li>Python pathlib/tempfile.</li><li>FFmpeg and ffprobe.</li><li>JSON manifest writer.</li><li>Atomic artifact writes.</li></ul></div><div><h3>GPU/AI</h3><ul><li>Faster-Whisper large-v3.</li><li>pyannote diarization, optional.</li><li>Silero VAD.</li><li>PySceneDetect and OCR.</li></ul></div><div><h3>Outputs</h3><ul><li><code>metadata.json</code></li><li><code>transcript.json</code></li><li><code>speakers.json</code></li><li><code>audio_events.json</code></li><li><code>visual_events.json</code></li></ul></div></div>
+      <h3>Canonical evidence object</h3><pre><code>{
+  "run_id": "run_001",
+  "word_id": 4421,
+  "start_s": 734.12,
+  "end_s": 735.04,
+  "text": "First check toh",
+  "speaker": "speaker_2",
+  "language": "hi-en",
+  "confidence": 0.94
+}</code></pre>
+      <div class="callout risk"><strong>Do not silently fall back:</strong> every run must state whether transcript, embeddings, proposal generation, and rendering used real or mock components. Evaluation mode should fail closed when a required real artifact is missing.</div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">05 / Working mechanism</div><h2>Flow 2 — Evidence-to-clip pipeline</h2>
+      <p>Flow 2 turns the evidence timeline into ranked, rendered, and reviewable proposals.</p>
+      <div class="pipeline"><div class="stage"><b>01 / GENERATE</b><strong>Candidate windows</strong><p>15/30/45/60/90 seconds from multiple signals.</p></div><div class="stage"><b>02 / ALIGN</b><strong>Snap boundaries</strong><p>Words, sentences, pauses, speakers, shots.</p></div><div class="stage"><b>03 / FEATURES</b><strong>Score signals</strong><p>Narrative, creator, text, audio, visual.</p></div><div class="stage"><b>04 / RANK</b><strong>Order candidates</strong><p>Transparent score; later learning-to-rank.</p></div><div class="stage"><b>05 / RERANK</b><strong>Use LLM selectively</strong><p>Top 10–20 candidates only.</p></div><div class="stage"><b>06 / PROPOSE</b><strong>Write copy</strong><p>Title, hook, captions, platform variants.</p></div><div class="stage"><b>07 / VALIDATE</b><strong>Ground output</strong><p>Schema, timestamps, claims, duration.</p></div><div class="stage"><b>08 / RENDER</b><strong>Make previews</strong><p>9:16 MP4, SRT/VTT, thumbnail.</p></div></div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">06 / Pipeline 2 components</div><h2>Flow 2 — Technical components and contracts</h2>
+      <div class="grid"><div class="card"><h3>Candidate generation</h3><ul><li>Questions and contrasts.</li><li>Stories and conclusions.</li><li>Pauses, energy, scene changes.</li><li>Archive topic matches.</li></ul></div><div class="card"><h3>Ranking</h3><ul><li>Self-containedness.</li><li>Narrative completeness.</li><li>Creator style match.</li><li>Context dependency penalty.</li></ul></div><div class="card"><h3>Output package</h3><ul><li>Rendered MP4.</li><li>SRT/VTT.</li><li>Title/caption JSON.</li><li>Source-range manifest.</li></ul></div></div>
+      <pre><code>{
+  "candidate_id": "c_018",
+  "start_s": 733.84,
+  "end_s": 778.92,
+  "signals": ["personal_story", "pause", "payoff"],
+  "features": {
+    "self_containedness": 0.89,
+    "creator_match": 0.78,
+    "context_dependency": 0.12
+  },
+  "ranking_score": 0.84
+}</code></pre>
+      <div class="callout"><strong>Design rule:</strong> candidate generation maximizes recall; ranking maximizes usefulness; the creator remains the final quality gate.</div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">07 / Technology choice</div><h2>Tech stack for this MVP and why</h2>
+      <table><tr><th>Layer</th><th>Technology</th><th>Reason for this version</th></tr><tr><td>Runtime</td><td>Python 3.11+</td><td>Fastest path to media, ML, JSON, and web integration on JarvisLabs.</td></tr><tr><td>Web</td><td>FastAPI + HTML/CSS/JS</td><td>Lightweight review interface without frontend build complexity.</td></tr><tr><td>Media</td><td>FFmpeg/ffprobe</td><td>Reliable extraction, cutting, resizing, captions, and encoding.</td></tr><tr><td>ASR</td><td>Faster-Whisper large-v3</td><td>GPU-accelerated English/Hindi/Hinglish transcription with timestamps.</td></tr><tr><td>Audio</td><td>Silero VAD + librosa/torchaudio</td><td>Local pause, speech, and energy signals.</td></tr><tr><td>Storage</td><td>Filesystem + JSON</td><td>Inspectable, cheap, persistent enough for a controlled cohort.</td></tr><tr><td>Embeddings</td><td>Local sentence-transformers</td><td>Offline archive similarity without vector database overhead.</td></tr><tr><td>LLM</td><td>One API or local model</td><td>Proposal generation and top-candidate narrative review.</td></tr><tr><td>Evaluation</td><td>Python metrics + run JSON</td><td>Reproducible comparisons without MLOps infrastructure.</td></tr></table>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">08 / FAQ</div><h2>Media-processing terms in plain language</h2>
+      <p class="lead">These components do different jobs. Some understand the content, while others only inspect or transform media files.</p>
+      <div class="grid">
+        <div class="card"><h3>WAV</h3><p><strong>Working audio file.</strong> The system extracts the audio track from the MP4 into a consistent format so speech and sound models can process it reliably.</p><p class="subtle">It is an internal artifact, not the final creator output.</p></div>
+        <div class="card"><h3>Proxy MP4</h3><p><strong>Smaller working video.</strong> A lower-resolution copy used for faster frame analysis, previews, and scene detection. The original remains untouched for final rendering.</p></div>
+        <div class="card"><h3>ASR</h3><p><strong>Automatic Speech Recognition.</strong> Converts spoken audio into timestamped text. Faster-Whisper is the recommended ASR model for English, Hindi, and Hinglish.</p></div>
+        <div class="card"><h3>VAD / Silero VAD</h3><p><strong>Voice Activity Detection.</strong> Finds where speech and silence occur. Silero VAD is the lightweight model used to improve boundaries and avoid dead air.</p></div>
+        <div class="card"><h3>pyannote diarization</h3><p><strong>Speaker identification over time.</strong> Labels turns such as Speaker 1 and Speaker 2, helping avoid awkward cuts between a host and guest.</p><p class="subtle">Optional for the first MVP because it costs more compute and needs model setup.</p></div>
+        <div class="card"><h3>FFmpeg / ffprobe</h3><p><strong>Media tools.</strong> FFmpeg extracts, converts, cuts, resizes, captions, and renders video. ffprobe inspects duration, codecs, resolution, frame rate, and streams before processing.</p></div>
+        <div class="card"><h3>PySceneDetect</h3><p><strong>Visual shot-change detector.</strong> Finds points where the camera, slide, or visual composition changes so clip boundaries and thumbnails can align with natural transitions.</p></div>
+      </div>
+      <div class="callout"><strong>Simple mental model:</strong> ffprobe asks “what is this file?”, FFmpeg changes the file, ASR says “what was said?”, VAD says “when was someone speaking?”, pyannote says “who was speaking?”, and PySceneDetect says “when did the picture change?”</div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">09 / Component classification</div><h2>Deterministic, probabilistic, human-in-the-loop</h2>
+      <div class="legend"><span><i class="swatch" style="border-color:var(--green);background:#172a29"></i> deterministic</span><span><i class="swatch" style="border-color:var(--blue);background:#1d2941"></i> probabilistic</span><span><i class="swatch" style="border-color:var(--yellow);background:#302719"></i> human</span></div>
+      <div class="component"><div style="border-color:var(--green)"><h3>Deterministic</h3><ul><li>File validation.</li><li>FFmpeg extraction/rendering.</li><li>Timestamp arithmetic.</li><li>Boundary snapping.</li><li>JSON/schema checks.</li><li>Run state and manifests.</li><li>Export packaging.</li></ul></div><div style="border-color:var(--blue)"><h3>Probabilistic</h3><ul><li>ASR and diarization.</li><li>Embeddings and similarity.</li><li>Audio/visual interpretation.</li><li>Narrative ranking.</li><li>LLM reranking.</li><li>Titles, hooks, captions.</li><li>Translation.</li></ul></div><div style="border-color:var(--yellow)"><h3>Human authority</h3><ul><li>Creator profile correction.</li><li>Candidate approval.</li><li>Boundary edits.</li><li>Caption/title edits.</li><li>Rejection reasons.</li><li>Publishability judgment.</li><li>Evaluation labels.</li></ul></div></div>
+      <div class="callout warn"><strong>Safety principle:</strong> probabilistic components propose meaning; deterministic components protect evidence and file correctness; the human decides whether the result is worth publishing.</div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">10 / MVP operating model</div><h2>Filesystem artifacts replace a database—temporarily</h2>
+      <pre><code>ipostpilot/
+  app/
+  data/creators/creator_001/
+    creator_skill.md
+    approved_examples.json
+    rejected_examples.json
+  runs/run_20260913_001/
+    manifest.json
+    status.json
+    artifacts/
+      audio.wav
+      proxy.mp4
+      transcript.json
+      speakers.json
+      audio_events.json
+      visual_events.json
+    candidates.json
+    proposals.json
+    decisions.json
+    metrics.json
+    outputs/
+      clip_001.mp4
+      clip_001.srt
+      clip_001.jpg
+      export.json</code></pre>
+      <div class="grid"><div class="card"><h3>Why it works now</h3><p>One GPU worker, sequential runs, small creator cohort, manual review, easy inspection and backup.</p></div><div class="card"><h3>Required discipline</h3><p>Atomic writes, immutable source files, artifact versions, explicit stage status, no silent fallbacks.</p></div><div class="card"><h3>Migration trigger</h3><p>Move to a database when concurrent users, archive search, access control, and durable querying become real requirements.</p></div></div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">11 / Production roadmap</div><h2>What remains the same—and what gets added</h2>
+      <table><tr><th>Capability</th><th>Remains the same</th><th>Production addition</th></tr><tr><td>Media truth</td><td>FFmpeg, immutable source, evidence ranges.</td><td>Object storage, signed URLs, retention controls.</td></tr><tr><td>AI cascade</td><td>ASR → features → candidate ranking → LLM proposals.</td><td>Model registry, queues, autoscaling, retries.</td></tr><tr><td>Creator control</td><td>Approve/edit/reject and structured reasons.</td><td>Multi-tenant auth, permissions, collaboration.</td></tr><tr><td>Feedback</td><td>Decisions become training/evaluation evidence.</td><td>Database, analytics, learning-to-rank service.</td></tr><tr><td>Web review</td><td>Playback, waveform, transcript, boundaries.</td><td>Realtime jobs, CDN delivery, accessibility, audit.</td></tr><tr><td>Evaluation</td><td>Baseline comparison and workflow metrics.</td><td>CI evals, monitoring, alerts, regression gates.</td></tr></table>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">12 / Implementation sequence</div><h2>Build order and exit criteria</h2>
+      <ol class="flowlist"><li><strong>Environment:</strong> JarvisLabs CUDA, FFmpeg, model cache, persistent directories. <span class="tag green">Smoke test</span></li><li><strong>Evidence:</strong> one complete video, transcript, word timestamps, proxy, reusable artifacts. <span class="tag blue">Traceable</span></li><li><strong>Candidates:</strong> 30/45/60-second windows with aligned boundaries. <span class="tag yellow">Timestamp-correct</span></li><li><strong>Rendering:</strong> real 9:16 previews with captions and manifest. <span class="tag purple">Reviewable</span></li><li><strong>Web review:</strong> approve/edit/reject and time tracking. <span class="tag green">Measurable</span></li><li><strong>Evaluation:</strong> manual, rules, embeddings, hybrid comparisons. <span class="tag blue">Evidence-led</span></li><li><strong>Cohort:</strong> repeat with multiple creators before personalization claims. <span class="tag yellow">Generalizable</span></li></ol>
+      <div class="callout risk"><strong>Go/no-go:</strong> do not add fine-tuning or auto-publishing until the system can repeatedly render timestamp-correct clips, preserve Hindi/Hinglish meaning, capture corrections, and reduce review time against a manual baseline.</div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">13 / Conclusion</div><h2>Simple infrastructure. Serious experiment.</h2>
+      <p class="lead">A database-free MVP is technically sufficient because the hypothesis concerns creator workflow value—not production scale.</p>
+      <div class="grid"><div class="card"><h3>Build now</h3><p>One Python app, one GPU worker, FFmpeg, JSON artifacts, web review, rendered clips, one LLM/API.</p></div><div class="card"><h3>Protect</h3><p>Word-level evidence, artifact reuse, real/mock labeling, deterministic validation, creator authority.</p></div><div class="card"><h3>Measure</h3><p>Time-to-publish, approval, edits, boundary corrections, candidate recall, creator reuse intent.</p></div></div>
+      <div class="callout"><strong>Final recommendation:</strong> use the RTX PRO 6000 and JarvisLabs credits to build an evaluation-ready, file-based media workflow first. Add databases and production infrastructure only after the creator workflow shows repeatable value.</div>
+      <p class="subtle">The MVP succeeds when it helps a creator make a confident publishing decision faster—not when it produces the most elaborate architecture.</p>
+    </section>
+  </main>
+  <div class="footer-note">Use ← / → or buttons to navigate · Press P to print</div>
+</div>
+<script>
+  const slides=[...document.querySelectorAll('.slide')];let index=0;const counter=document.getElementById('counter'),progress=document.getElementById('progress');
+  function show(next){index=(next+slides.length)%slides.length;slides.forEach((s,i)=>s.classList.toggle('active',i===index));counter.textContent=`${index+1} / ${slides.length}`;progress.style.width=`${((index+1)/slides.length)*100}%`;document.querySelector('.slides').scrollTop=0;history.replaceState(null,'',`#${index+1}`)}
+  document.getElementById('prev').addEventListener('click',()=>show(index-1));document.getElementById('next').addEventListener('click',()=>show(index+1));document.getElementById('print').addEventListener('click',()=>window.print());
+  document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')show(index+1);if(e.key==='ArrowLeft')show(index-1);if(e.key.toLowerCase()==='p')window.print()});
+  const hash=Number.parseInt(location.hash.slice(1),10);show(Number.isFinite(hash)&&hash>0?hash-1:0);
+</script>
+</body>
+</html>

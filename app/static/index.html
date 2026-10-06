@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>I-PostPilot MVP</title>
+  <style>
+    :root{--ink:#172033;--muted:#68738a;--line:#e5e9f1;--brand:#5b4bdb;--brand-dark:#4536bd;--soft:#f5f6ff;--good:#16845b;--bad:#b43e4e;--card:#fff}
+    *{box-sizing:border-box}body{margin:0;color:var(--ink);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;background:linear-gradient(135deg,#f5f7ff,#fbfbfd 48%,#f2f0ff);min-height:100vh}
+    .shell{max-width:1120px;margin:auto;padding:28px 20px 64px}.hero{display:flex;justify-content:space-between;gap:24px;align-items:flex-start;margin:12px 0 28px}.eyebrow{color:var(--brand);font-weight:800;letter-spacing:.12em;text-transform:uppercase;font-size:12px}.hero h1{font-size:clamp(30px,5vw,52px);line-height:1.05;margin:8px 0 12px;letter-spacing:-.04em}.hero p{color:var(--muted);max-width:670px;margin:0;font-size:17px}.badge{background:#ebe9ff;color:var(--brand-dark);padding:8px 12px;border-radius:999px;font-weight:700;white-space:nowrap}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}.step{background:rgba(255,255,255,.7);border:1px solid var(--line);border-radius:14px;padding:14px}.step strong{display:block}.step span{color:var(--muted);font-size:13px}.step.active{border-color:#b8b0ff;background:var(--soft)}.num{display:inline-grid;place-items:center;width:25px;height:25px;border-radius:50%;background:var(--brand);color:white;font-weight:800;margin-right:7px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px;margin:16px 0;box-shadow:0 12px 30px rgba(34,41,71,.06)}.card h2{margin:0 0 6px;font-size:21px}.card h3{margin:20px 0 8px}.muted{color:var(--muted)}.hint{color:var(--muted);font-size:13px;margin-top:4px}.hidden{display:none!important}
+    form{display:grid;gap:12px}.grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px}label{font-weight:700;font-size:13px;display:grid;gap:6px}input,select,textarea{width:100%;border:1px solid #d8ddea;border-radius:10px;padding:11px 12px;background:#fff;color:var(--ink);font:inherit}input[type=file]{padding:9px;background:#fafbff}textarea{resize:vertical}
+    button{border:0;border-radius:10px;padding:11px 16px;background:var(--brand);color:#fff;font:700 14px inherit;cursor:pointer;transition:.15s transform,.15s background}button:hover{background:var(--brand-dark);transform:translateY(-1px)}button:disabled{background:#c4c8d5;cursor:not-allowed;transform:none}.secondary{background:#eef0f7;color:var(--ink)}.secondary:hover{background:#e1e4ef}.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.status{padding:11px 13px;border-radius:10px;background:#f6f7fb;color:var(--muted);min-height:43px}.status.good{background:#eaf8f1;color:var(--good)}.status.error{background:#fff0f2;color:var(--bad)}
+    .progress{height:8px;background:#e9ebf3;border-radius:99px;overflow:hidden}.progress div{height:100%;width:0;background:linear-gradient(90deg,var(--brand),#887dff);transition:width .15s ease}.progress-wrap{display:grid;gap:5px;margin-top:4px}.progress-label{font-size:12px;color:var(--muted)}
+    .profile{background:#141827;color:#e9ecf5;border-radius:12px;padding:16px;overflow:auto;max-height:330px;font:12px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace}    .proposal{border:1px solid var(--line);border-radius:14px;padding:17px;margin:12px 0;background:#fff}.proposal header{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.proposal h3{margin:0;font-size:16px}.time{color:var(--brand);font-weight:700;font-size:13px;white-space:nowrap}.proposal p{color:var(--muted);margin:10px 0}.confidence{font-size:12px;color:var(--muted)}.download{display:inline-block;color:var(--brand-dark);font-weight:700;margin-top:8px}.clip-preview{width:100%;max-height:420px;border-radius:10px;margin-top:12px;background:#111}
+    @media(max-width:720px){.hero{display:block}.badge{display:inline-block;margin-top:16px}.steps,.grid{grid-template-columns:1fr}.card{padding:18px}.proposal header{display:block}.time{display:block;margin-top:5px}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <header class="hero">
+    <div><div class="eyebrow">Creator intelligence workspace</div><h1>I-PostPilot</h1><p>Teach the system what a creator likes, then use that profile to find and review promising clips from a long-form video.</p></div>
+    <div class="badge">MVP · Human review required</div>
+  </header>
+  <div class="steps">
+    <div class="step active"><strong><span class="num">1</span>Creator setup</strong><span>Define language and duration preferences.</span></div>
+    <div class="step"><strong><span class="num">2</span>Historical examples</strong><span>Upload approved/rejected Shorts with transcripts.</span></div>
+    <div class="step"><strong><span class="num">3</span>Generate & review</strong><span>Rank clips and capture creator feedback.</span></div>
+  </div>
+
+  <section class="card">
+    <h2>1. Create creator profile</h2><p class="muted">This is the starting point for Flow 1. The profile remains editable through the API and must be approved before personalization.</p>
+    <form id="creatorForm"><div class="grid">
+      <label>Creator name<input name="name" placeholder="e.g. Raj Shamani" required></label>
+      <label>Languages<input name="languages" placeholder="english,hindi,hinglish"></label>
+      <label>Preferred duration (seconds)<input name="preferred_duration_seconds" type="number" value="60" min="15" max="180"></label>
+    </div><div class="actions"><button>Create creator</button><span id="creatorStatus" class="status">No creator created yet.</span></div></form>
+    <form id="exampleForm" class="hidden">
+      <h3>2. Add a historical video example</h3><p class="hint">Upload a Short/Reel and its transcript as a pair. Use <b>approved</b> for content the creator would publish and <b>rejected</b> for content they would not.</p>
+      <div class="grid"><label>Short/Reel video<input type="file" name="video" accept="video/*" required></label><label>Transcript (.txt/.json)<input type="file" name="transcript" accept=".txt,.json" required></label><label>Example name<input name="name" placeholder="Short 01"></label></div>
+      <div class="actions"><select name="label" aria-label="Example label"><option value="approved">Approved example</option><option value="rejected">Rejected example</option></select><button id="addExample">Add example</button><button type="button" id="buildProfile" class="secondary">Build profile</button></div>
+      <div id="exampleProgressWrap" class="progress-wrap hidden"><div class="progress-label" id="exampleProgressLabel">Uploading…</div><div class="progress"><div id="exampleProgress"></div></div></div>
+    </form>
+    <pre id="profile" class="profile hidden"></pre>
+    <label id="personaEditorWrap" class="hidden">Edit persona JSON
+      <textarea id="personaEditor" rows="10" spellcheck="false"></textarea>
+    </label>
+    <div class="actions"><button id="savePersona" type="button" class="secondary hidden">Save persona edits</button><button id="approveProfile" disabled>Approve profile</button><span id="approvalStatus" class="status">Build a profile after adding examples.</span></div>
+  </section>
+
+  <section class="card">
+    <h2>3. Find clips in a new video</h2><p class="muted">Use a transcript for a fast test, or upload video without a transcript to run Faster-Whisper on the GPU.</p>
+    <form id="jobForm"><input type="hidden" name="creator_id" id="creatorId">
+      <div class="grid"><label>New long-form video<input type="file" name="video" accept="video/*"></label><label>Existing transcript<input type="file" name="transcript" accept=".txt,.json"></label><label>Or paste transcript<textarea name="transcript_text" rows="2" placeholder="Paste text for a quick test"></textarea></label></div>
+      <div class="actions"><button id="generate" disabled>Generate personalized proposals</button><span id="jobStatus" class="status">Approve a creator profile first.</span></div><div id="jobProgressWrap" class="progress-wrap hidden"><div class="progress-label" id="jobProgressLabel">Uploading…</div><div class="progress"><div id="jobProgress"></div></div></div>
+    </form>
+  </section>
+  <section id="results" class="hidden"><div class="card"><h2>Candidate review</h2><p id="resultSummary" class="muted"></p><div id="proposalList"></div><a id="exportLink" class="download">Download Markdown export</a></div></section>
+</main>
+<script>
+const $=s=>document.querySelector(s), state={creatorId:null};
+function status(el,text,type=""){el.textContent=text;el.className="status "+type}
+async function jsonFetch(url,options){const r=await fetch(url,options);const raw=await r.text();let j=null;try{j=raw?JSON.parse(raw):null}catch(_err){}if(!r.ok)throw new Error((j&&j.detail)||raw||`Request failed (${r.status})`);if(j===null)throw new Error("Server returned an invalid JSON response");return j}
+function uploadWithProgress(url,form,bar,label,wrap){return new Promise((resolve,reject)=>{const request=new XMLHttpRequest();request.open("POST",url);request.upload.onprogress=e=>{if(!e.lengthComputable)return;const percent=Math.round(e.loaded/e.total*100);bar.style.width=percent+"%";label.textContent=`Uploading… ${percent}%`};request.upload.onload=()=>{bar.style.width="100%";label.textContent="Upload complete. Processing…"};request.onload=()=>{try{const body=JSON.parse(request.responseText);if(request.status<200||request.status>=300)throw new Error(body.detail||"Request failed");resolve(body)}catch(err){reject(err)}};request.onerror=()=>reject(new Error("Network error during upload"));request.onabort=()=>reject(new Error("Upload cancelled"));wrap.classList.remove("hidden");bar.style.width="0%";request.send(form)})}
+$("#creatorForm").onsubmit=async e=>{e.preventDefault();try{const fd=new FormData(e.target),p={languages:(fd.get("languages")||"").split(",").map(x=>x.trim()).filter(Boolean),preferred_duration_seconds:Number(fd.get("preferred_duration_seconds"))},body=new FormData();body.append("name",fd.get("name"));body.append("preferences",JSON.stringify(p));const j=await jsonFetch("/api/creators",{method:"POST",body});state.creatorId=j.id;$("#creatorId").value=j.id;$("#exampleForm").classList.remove("hidden");status($("#creatorStatus"),"Creator created. Add your historical video examples.","good")}catch(err){status($("#creatorStatus"),err.message,"error")}};
+$("#exampleForm").onsubmit=async e=>{e.preventDefault();const button=$("#addExample");button.disabled=true;try{const j=await uploadWithProgress("/api/creators/"+state.creatorId+"/examples",new FormData(e.target),$("#exampleProgress"),$("#exampleProgressLabel"),$("#exampleProgressWrap"));status($("#creatorStatus"),`Saved ${j.video_uploaded?"video + transcript":"transcript"} example.`,"good");e.target.reset();setTimeout(()=>$("#exampleProgressWrap").classList.add("hidden"),1200)}catch(err){status($("#creatorStatus"),err.message,"error");$("#exampleProgressLabel").textContent="Upload failed"}finally{button.disabled=false}};
+$("#buildProfile").onclick=async()=>{try{const j=await jsonFetch("/api/creators/"+state.creatorId+"/build-profile",{method:"POST"});$("#profile").textContent=JSON.stringify(j,null,2);$("#profile").classList.remove("hidden");$("#personaEditor").value=JSON.stringify(j,null,2);$("#personaEditorWrap").classList.remove("hidden");$("#savePersona").classList.remove("hidden");$("#approveProfile").disabled=false;status($("#approvalStatus"),"Draft ready. Review or edit the persona JSON, then approve it.")}catch(err){status($("#approvalStatus"),err.message,"error")}};
+$("#approveProfile").onclick=async()=>{try{await jsonFetch("/api/creators/"+state.creatorId+"/approve-profile",{method:"POST"});$("#generate").disabled=false;status($("#approvalStatus"),"Profile approved. Personalization is enabled.","good");status($("#jobStatus"),"Ready to process a new video or transcript.","good")}catch(err){status($("#approvalStatus"),err.message,"error")}};
+$("#jobForm").onsubmit=async e=>{e.preventDefault();const button=$("#generate");button.disabled=true;try{const j=await uploadWithProgress("/api/jobs",new FormData(e.target),$("#jobProgress"),$("#jobProgressLabel"),$("#jobProgressWrap"));$("#results").classList.remove("hidden");status($("#jobStatus"),"Upload complete. Processing transcript/video…");poll(j.id)}catch(err){status($("#jobStatus"),err.message,"error");$("#jobProgressLabel").textContent="Upload failed"}finally{button.disabled=false}};
+async function poll(id){try{const j=await jsonFetch("/api/jobs/"+id);if(j.status==="processing"){setTimeout(()=>poll(id),900);return}if(j.status==="failed"||j.error){status($("#jobStatus"),`Job failed: ${j.error||"unknown error"}`,"error");return}$("#resultSummary").textContent=`Mode: ${j.mode||"ready"} · ${j.proposals.length} clips ranked`;$("#exportLink").href="/api/jobs/"+id+"/export.md";$("#proposalList").innerHTML=j.proposals.map(p=>`<article class="proposal"><header><h3>${escapeHtml(p.title)}</h3><span class="time">${p.start.toFixed(1)}s – ${p.end.toFixed(1)}s</span></header><p>${escapeHtml(p.transcript)}</p><span class="confidence">Confidence ${p.confidence}</span><video id="preview-${p.id}" class="clip-preview hidden" controls></video><div class="actions"><button onclick="renderClip('${p.id}',this)">Render 9:16 clip</button><a id="download-${p.id}" class="download hidden" download="${escapeHtml(p.id)}.mp4">Download clip</a><a class="download" href="/api/proposals/${p.id}/captions.srt">SRT</a><a class="download" href="/api/proposals/${p.id}/captions.vtt">VTT</a><button onclick="act('${p.id}','approve')">Approve</button><button class="secondary" onclick="act('${p.id}','reject')">Reject</button><button class="secondary" onclick="act('${p.id}','edit')">Add feedback</button></div></article>`).join("")}catch(err){status($("#jobStatus"),`Could not read job status: ${err.message}`,"error")}}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+async function renderClip(id,button){button.disabled=true;button.textContent="Rendering…";try{const r=await fetch("/api/proposals/"+id+"/render",{method:"POST"});if(!r.ok){const raw=await r.text();let detail=raw;try{detail=JSON.parse(raw).detail||raw}catch(_err){}throw new Error(detail)}const blob=await r.blob();const url=URL.createObjectURL(blob);const video=document.querySelector("#preview-"+id);video.src=url;video.classList.remove("hidden");const link=document.querySelector("#download-"+id);link.href=url;link.classList.remove("hidden")}catch(err){alert("Could not render clip: "+err.message)}finally{button.disabled=false;button.textContent="Render clip"}}
+$("#savePersona").onclick=async()=>{try{const body=new FormData();body.append("profile",$("#personaEditor").value);const j=await jsonFetch("/api/creators/"+state.creatorId+"/profile",{method:"PUT",body});$("#profile").textContent=JSON.stringify(j.profile,null,2);status($("#approvalStatus"),"Persona edits saved. Approve the draft to use them.","good")}catch(err){status($("#approvalStatus"),err.message,"error")}};
+async function act(id,action){const body=new FormData();body.append("action",action);if(action==="edit"){const value=prompt("What should change?");if(value===null)return;body.append("feedback",value)}try{await jsonFetch("/api/proposals/"+id+"/feedback",{method:"POST",body});alert("Feedback saved")}catch(err){alert(err.message)}}
+</script>
+</body>
+</html>
